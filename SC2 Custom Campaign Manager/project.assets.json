@@ -1,0 +1,13 @@
+{
+  "runtimes": {
+    "osx-x64": {
+      "#import": []
+    },
+    "win10-x64": {
+      "#import": []
+    },
+    "osx.11.0-arm64": {
+      "#import": []
+    }
+  }
+}

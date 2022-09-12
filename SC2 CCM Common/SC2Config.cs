@@ -74,7 +74,7 @@ namespace SC2_CCM_Common
             {
                 try
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(_legacyConfigPath));
+                    Directory.CreateDirectory(Path.GetDirectoryName(_legacyConfigPath)!);
                 }
                 catch (IOException)
                 {
@@ -129,14 +129,33 @@ namespace SC2_CCM_Common
             }
             else
             {
-                return Task.FromResult(SC2Config.FromFile(_newConfigPath));
+                var config = FromFile(_newConfigPath);
+                
+                // If we failed to load our config file, just get a new, blank config
+                if (config == null)
+                {
+                    return InitBlankConfig(fallbackPathFinder);
+                }
+                return Task.FromResult(config);
             }
         }
 
-        private static SC2Config FromFile(string newConfigPath)
+        private static SC2Config? FromFile(string newConfigPath)
         {
-            var data = JsonSerializer.Deserialize<SC2ConfigData>(File.ReadAllText(newConfigPath));
-            return new SC2Config(data);
+            try
+            {
+                var data = JsonSerializer.Deserialize<SC2ConfigData>(File.ReadAllText(newConfigPath));
+                if (data == null)
+                {
+                    return null;
+                }
+
+                return new SC2Config(data);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private static async Task<SC2Config> MigrateLegacyConfig(Func<Task<string>> fallbackPathFinder)

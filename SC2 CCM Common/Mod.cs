@@ -63,7 +63,7 @@ namespace SC2_CCM_Common
                 ProcessLine(readLine, ref mod);
             }
 
-            mod.Path = System.IO.Path.GetDirectoryName(metadataFile);
+            mod.Path = System.IO.Path.GetDirectoryName(metadataFile)!;
             return mod;
         }
 

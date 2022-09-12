@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
+        <TargetFrameworks>net6.0-maccatalyst</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net6.0-tizen</TargetFrameworks> -->
@@ -15,7 +15,7 @@
         <ApplicationTitle>SC2 Custom Campaign Manager</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.sc2_custom_campaign_manager</ApplicationId>
+        <ApplicationId>com.mtolman.sc2_custom_campaign_manager</ApplicationId>
         <ApplicationIdGuid>E56D783F-80C9-4EEC-A8F1-A717D40396F7</ApplicationIdGuid>
 
         <!-- Versions -->
