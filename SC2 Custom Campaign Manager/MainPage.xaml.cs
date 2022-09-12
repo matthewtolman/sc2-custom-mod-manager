@@ -162,7 +162,7 @@ public partial class MainPage : ContentPage
     {
         var newLabel = new Label();
         newLabel.Text = text;
-        MessageOutput.Children.Add(newLabel);
+        MessageOutput.Children.Insert(0, newLabel);
     }
 
     private EventHandler<ToggledEventArgs> MakeOnToggled(Campaign campaign)
