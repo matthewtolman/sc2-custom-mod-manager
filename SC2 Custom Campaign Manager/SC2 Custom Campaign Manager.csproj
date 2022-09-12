@@ -47,6 +47,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SC2 CCM Common\SC2 CCM Common.csproj" />
+      <ProjectReference Include="..\SC2_CCM_Common\SC2_CCM_Common.csproj" />
     </ItemGroup>
 </Project>

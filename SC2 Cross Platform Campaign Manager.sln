@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2 Custom Campaign Manager", "SC2 Custom Campaign Manager\SC2 Custom Campaign Manager.csproj", "{0BB0964D-BD7C-43CC-B32B-9368D1C08E2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2 CCM Common", "SC2 CCM Common\SC2 CCM Common.csproj", "{49ACA4C5-9914-4B61-B0FD-D1C638CD6DE5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2_CCM_Common", "SC2_CCM_Common\SC2_CCM_Common.csproj", "{102D5E83-2BE5-4714-B11C-26EE0A25B47E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +15,9 @@ Global
 		{0BB0964D-BD7C-43CC-B32B-9368D1C08E2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BB0964D-BD7C-43CC-B32B-9368D1C08E2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BB0964D-BD7C-43CC-B32B-9368D1C08E2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49ACA4C5-9914-4B61-B0FD-D1C638CD6DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49ACA4C5-9914-4B61-B0FD-D1C638CD6DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49ACA4C5-9914-4B61-B0FD-D1C638CD6DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49ACA4C5-9914-4B61-B0FD-D1C638CD6DE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{102D5E83-2BE5-4714-B11C-26EE0A25B47E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{102D5E83-2BE5-4714-B11C-26EE0A25B47E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{102D5E83-2BE5-4714-B11C-26EE0A25B47E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{102D5E83-2BE5-4714-B11C-26EE0A25B47E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
