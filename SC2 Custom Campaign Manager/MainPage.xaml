@@ -1,0 +1,334 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SC2_Custom_Campaign_Manager.MainPage">
+
+    <ScrollView>
+    <VerticalStackLayout
+            Padding="20,30">
+        <HorizontalStackLayout
+            x:Name="ActionPane"
+            Spacing="25"
+            Padding="30,0">
+            <Button
+                x:Name="ImportButton"
+                Text="Import Custom Campaign"
+                SemanticProperties.Hint="Import custom campaign file"
+                Clicked="ImportButton_Clicked"
+                />
+            <Button
+                x:Name="Refresh"
+                Text="Refresh"
+                SemanticProperties.Hint="Refresh Campaign List"
+                Clicked="Refresh_Clicked"
+                />
+            <Button
+                x:Name="Info"
+                Text="About"
+                SemanticProperties.Hint="About Custom Campaign Manager"
+                />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout
+            x:Name="CampaignPane"
+            Spacing="25"
+            Padding="30,0">
+            <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
+                <VerticalStackLayout
+                    x:Name="WoLPane"
+                    Spacing="25" 
+                    Padding="0,0" 
+                    VerticalOptions="Center">
+                
+                    <Label 
+                        Text="Wings of Liberty"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="32"
+                        HorizontalOptions="Center" />
+
+                    <HorizontalStackLayout
+                            Spacing="25">
+                            <Label
+                                VerticalTextAlignment="Center"
+                                Text="Enable Custom Campaign"
+                                SemanticProperties.Hint="Enable Custom Wings of Liberty Campaign"
+                                ></Label>
+                            <Switch x:Name="CustomWoLEnabled"></Switch>
+                    </HorizontalStackLayout>
+
+                    <Picker
+                        x:Name="WoLModPicker">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>None</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+
+                    </Picker>
+
+                    <HorizontalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Author: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="WoLAuthor"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18"/>
+
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Description: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="WoLDescription"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+            <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
+                <VerticalStackLayout
+                    x:Name="HotsPane"
+                    Spacing="25" 
+                    Padding="0,0" 
+                    VerticalOptions="Center">
+                
+                    <Label 
+                        Text="Heart of the Swarm"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="32"
+                        HorizontalOptions="Center" />
+
+                    <HorizontalStackLayout
+                            Spacing="25">
+                            <Label
+                                VerticalTextAlignment="Center"
+                                Text="Enable Custom Campaign"
+                                SemanticProperties.Hint="Enable Custom Heart of the Swarm Campaign"
+                                ></Label>
+                            <Switch
+                                x:Name="CustomHotsEnabled"></Switch>
+                    </HorizontalStackLayout>
+
+                    <Picker
+                        x:Name="HotsModPicker">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>None</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+
+                    </Picker>
+
+                    <HorizontalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Author: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="HotsAuthor"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18"/>
+
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Description: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="HotsDescription"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+            <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
+                <VerticalStackLayout
+                    x:Name="LotvPane"
+                    Spacing="25" 
+                    Padding="0,0" 
+                    VerticalOptions="Center">
+                
+                    <Label 
+                        Text="Legacy of the Void"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="32"
+                        HorizontalOptions="Center" />
+
+                    <HorizontalStackLayout
+                            Spacing="25">
+                            <Label
+                                VerticalTextAlignment="Center"
+                                Text="Enable Custom Campaign"
+                                SemanticProperties.Hint="Enable Custom Legacy of the Void Campaign"
+                                ></Label>
+                            <Switch
+                                x:Name="CustomLotvEnabled"></Switch>
+                    </HorizontalStackLayout>
+
+                    <Picker
+                        x:Name="LotvModPicker">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>None</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+
+                    </Picker>
+
+                    <HorizontalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Author: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="LotvAuthor"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18"/>
+
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Description: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="LotvDescription"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+            <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
+                <VerticalStackLayout
+                    x:Name="NcoPane"
+                    Spacing="25" 
+                    Padding="0,0" 
+                    VerticalOptions="Center">
+                
+                    <Label 
+                        Text="Nova Covert Ops"
+                        SemanticProperties.HeadingLevel="Level1"
+                        FontSize="32"
+                        HorizontalOptions="Center" />
+
+                    <HorizontalStackLayout
+                            Spacing="25">
+                            <Label
+                                VerticalTextAlignment="Center"
+                                Text="Enable Custom Campaign"
+                                SemanticProperties.Hint="Enable Custom Nova Covert Ops Campaign"
+                                ></Label>
+                            <Switch
+                                x:Name="CustomNcoEnabled"></Switch>
+                    </HorizontalStackLayout>
+
+                    <Picker
+                        x:Name="NcoModPicker">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>None</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+
+                    </Picker>
+
+                    <HorizontalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Author: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="NcoAuthor"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18"/>
+
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout
+                            HorizontalOptions="Start">
+                        <Label 
+                            Text="Description: "
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+            
+                        <Label
+                            x:Name="NcoDescription"
+                            Text="N/A"
+                            SemanticProperties.HeadingLevel="Level2"
+                            SemanticProperties.Description="Campaign Author"
+                            FontSize="18" />
+
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+        </HorizontalStackLayout>
+        <VerticalStackLayout
+                Spacing="25" 
+                Padding="0,30"
+                MinimumHeightRequest="200">
+            <Label>Messages</Label>
+            <ScrollView Padding="15,25">
+                <Border StrokeThickness="5">
+                    <VerticalStackLayout
+                        x:Name="MessageOutput">
+                        <Label>StarCraft II Custom Campaign Manager</Label>
+
+                    </VerticalStackLayout>
+                </Border>
+            </ScrollView>
+
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+    </ScrollView>
+ 
+</ContentPage>
