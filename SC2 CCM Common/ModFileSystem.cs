@@ -294,7 +294,6 @@ namespace SC2_CCM_Common
         public void Install(Mod mod)
         {
             var campaignDir = CampaignDirectory(mod.GetCampaign());
-            _messageProcessor($"Installing mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaign())}\"...");
             if (ClearDirectory(campaignDir))
             {
                 CopyFilesAndFolders(mod.Path, campaignDir);
@@ -308,7 +307,6 @@ namespace SC2_CCM_Common
 
         public void Reset(Campaign campaign)
         {
-            _messageProcessor($"Resetting campaign \"{CampaignName(campaign)}\"....");
             var campaignDir = CampaignDirectory(campaign);
             if (ClearDirectory(campaignDir))
             {
