@@ -19,7 +19,7 @@ namespace SC2_CCM_Common
         public string StarCraft2Dir => Path.GetDirectoryName(_data.StarCraft2Exe)!;
         public string StarCraft2Exe => _data.StarCraft2Exe;
 
-        public ImmutableDictionary<Campaign, ImmutableDictionary<String, String?>> ModSelectionInfo
+        public ImmutableDictionary<CampaignType, ImmutableDictionary<String, String?>> ModSelectionInfo
         {
             get => _data.ModSelectionInfo;
             private set
@@ -39,11 +39,11 @@ namespace SC2_CCM_Common
         {
             ImmutableDictionary<string, string?> MakeDictEntry() => ImmutableDictionary.Create<String, String?>().Add("enabled", "off").Add("mod", null);
 
-            var blankConfig = ImmutableDictionary.Create<Campaign, ImmutableDictionary<String, String?>>()
-                .Add(Campaign.WingsOfLiberty, MakeDictEntry())
-                .Add(Campaign.HeartOfTheSwarm, MakeDictEntry())
-                .Add(Campaign.LegacyOfTheVoid, MakeDictEntry())
-                .Add(Campaign.NovaCovertOps, MakeDictEntry());
+            var blankConfig = ImmutableDictionary.Create<CampaignType, ImmutableDictionary<String, String?>>()
+                .Add(CampaignType.WingsOfLiberty, MakeDictEntry())
+                .Add(CampaignType.HeartOfTheSwarm, MakeDictEntry())
+                .Add(CampaignType.LegacyOfTheVoid, MakeDictEntry())
+                .Add(CampaignType.NovaCovertOps, MakeDictEntry());
 
             var data = new SC2ConfigData();
             data.StarCraft2Exe = path;
@@ -178,26 +178,26 @@ namespace SC2_CCM_Common
             return await Load(fallbackPathFinder);
         }
 
-        public void SetLoadedMod(Campaign campaign, string? modName)
+        public void SetLoadedMod(CampaignType campaignType, string? modName)
         {
-            ModSelectionInfo = ModSelectionInfo.SetItem(campaign,
-                ModSelectionInfo[campaign].SetItem("mod", modName));
+            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
+                ModSelectionInfo[campaignType].SetItem("mod", modName));
         }
 
-        public bool ModsEnabled(Campaign campaign)
+        public bool ModsEnabled(CampaignType campaignType)
         {
-            return ModSelectionInfo[campaign]["enabled"] == "on";
+            return ModSelectionInfo[campaignType]["enabled"] == "on";
         }
 
-        public void SetModEnabled(Campaign campaign, bool enabled)
+        public void SetModEnabled(CampaignType campaignType, bool enabled)
         {
-            ModSelectionInfo = ModSelectionInfo.SetItem(campaign,
-                ModSelectionInfo[campaign].SetItem("enabled", enabled ? "on" : "off"));
+            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
+                ModSelectionInfo[campaignType].SetItem("enabled", enabled ? "on" : "off"));
         }
 
-        public string? GetLoadedMod(Campaign campaign)
+        public string? GetLoadedMod(CampaignType campaignType)
         {
-            return ModSelectionInfo[campaign]["mod"];
+            return ModSelectionInfo[campaignType]["mod"];
         }
     }
 }

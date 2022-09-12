@@ -5,7 +5,7 @@ namespace SC2_Custom_Campaign_Manager;
 public partial class MainPage : ContentPage
 {
     private readonly SC2CCM sc2ccm;
-    Dictionary<Campaign, CampaignUiElements> campaignUi;
+    Dictionary<CampaignType, CampaignUiElements> campaignUi;
     private readonly string NoneItem = " -- NO CAMPAIGN SELECTED --";
 
     public MainPage()
@@ -14,17 +14,17 @@ public partial class MainPage : ContentPage
 
         sc2ccm = new SC2CCM(ShowMessage, FallbackFindPath);
 
-        campaignUi = new Dictionary<Campaign, CampaignUiElements>
+        campaignUi = new Dictionary<CampaignType, CampaignUiElements>
         {
-            { Campaign.WingsOfLiberty, new CampaignUiElements(CustomWoLEnabled, WoLModPicker, WoLAuthor, WoLDescription, WoLPane) },
-            { Campaign.HeartOfTheSwarm, new CampaignUiElements(CustomHotsEnabled, HotsModPicker, HotsAuthor, HotsDescription, HotsPane) },
-            { Campaign.LegacyOfTheVoid, new CampaignUiElements(CustomLotvEnabled, LotvModPicker, LotvAuthor, LotvDescription, LotvPane) },
-            { Campaign.NovaCovertOps, new CampaignUiElements(CustomNcoEnabled, NcoModPicker, NcoAuthor, NcoDescription, NcoPane) }
+            { CampaignType.WingsOfLiberty, new CampaignUiElements(CustomWoLEnabled, WoLModPicker, WoLAuthor, WoLDescription, WoLPane) },
+            { CampaignType.HeartOfTheSwarm, new CampaignUiElements(CustomHotsEnabled, HotsModPicker, HotsAuthor, HotsDescription, HotsPane) },
+            { CampaignType.LegacyOfTheVoid, new CampaignUiElements(CustomLotvEnabled, LotvModPicker, LotvAuthor, LotvDescription, LotvPane) },
+            { CampaignType.NovaCovertOps, new CampaignUiElements(CustomNcoEnabled, NcoModPicker, NcoAuthor, NcoDescription, NcoPane) }
         };
 
         foreach (var (campaign, ui) in campaignUi)
         {
-            ui.@switch.IsToggled = sc2ccm.Config.ModsEnabled(campaign);
+            ui.@switch.IsToggled = sc2ccm.ModsEnabled(campaign);
             ui.@switch.Toggled += MakeOnToggled(campaign);
         }
 
@@ -32,26 +32,24 @@ public partial class MainPage : ContentPage
         Load();
     }
 
-    private EventHandler MakeSelectedIndexChanged(Campaign campaign)
+    private EventHandler MakeSelectedIndexChanged(CampaignType campaignType)
     {
         return (sender, args) =>
         {
-            var picker = campaignUi[campaign].picker;
+            var picker = campaignUi[campaignType].picker;
             var title = picker.SelectedItem?.ToString();
-            if (title == NoneItem || title == null)
+            if (title == NoneItem || title == null || !sc2ccm.Mods(campaignType).ContainsKey(title))
             {
-                sc2ccm.Config.SetLoadedMod(campaign, null);
-                ClearMod(campaign);
+                sc2ccm.Reset(campaignType);
             }
             else
             {
-                sc2ccm.Config.SetLoadedMod(campaign, title);
-                LoadMod(campaign);
+                sc2ccm.InstallMod(sc2ccm.Mods(campaignType)[title]);
             }
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                SyncCampaignTextDisplay(campaign);
+                SyncCampaignTextDisplay(campaignType);
             });
         };
     }
@@ -62,15 +60,16 @@ public partial class MainPage : ContentPage
         ShowModList();
     }
 
-    private void SyncCampaignTextDisplay(Campaign campaign)
+    private void SyncCampaignTextDisplay(CampaignType campaignType)
     {
-        var mods = sc2ccm.Mods().Where(mod => mod.GetCampaign() == campaign).ToArray();
-        var ui = campaignUi[campaign];
-        var index = ui.picker.SelectedIndex - 1;
-        if (sc2ccm.Config.ModsEnabled(campaign) && index >= 0 && index < mods.Length)
+        var mods = sc2ccm.Mods(campaignType);
+        var ui = campaignUi[campaignType];
+        var title = ui.picker.SelectedItem?.ToString();
+        if (sc2ccm.ModsEnabled(campaignType) && title != null && mods.ContainsKey(title))
         {
-            ui.authorLabel.Text = mods[index].Author;
-            ui.descriptionLabel.Text = mods[index].Desc;
+            var mod = mods[title];
+            ui.authorLabel.Text = mod.Author;
+            ui.descriptionLabel.Text = mod.Desc;
             ui.descriptionLabel.WidthRequest = 300;
             ui.authorLabel.WidthRequest = 220;
         }
@@ -81,31 +80,30 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void SyncCampaignDisplay(Campaign campaign)
+    private void SyncCampaignDisplay(CampaignType campaignType)
     {
-        var mods = sc2ccm.Mods().Where(mod => mod.GetCampaign() == campaign).ToArray();
-        var ui = campaignUi[campaign];
+        var mods = sc2ccm.Mods(campaignType);
+        var ui = campaignUi[campaignType];
         if (ui.pickerHandler != null)
         {
             ui.picker.SelectedIndexChanged -= ui.pickerHandler;
             ui.pickerHandler = null;
         }
-        ui.picker.IsEnabled = sc2ccm.Config.ModsEnabled(campaign);
-        if (mods.Length == 0)
+        ui.picker.IsEnabled = sc2ccm.ModsEnabled(campaignType);
+        if (mods.Count == 0)
         {
-            if (sc2ccm.Config.GetLoadedMod(campaign) != null)
+            if (sc2ccm.GetLoadedModTitle(campaignType) != null)
             {
-                sc2ccm.Config.SetLoadedMod(campaign, null);
                 ui.picker.ItemsSource = new List<String> { NoneItem };
                 ui.picker.SelectedIndex = 0;
-                ClearMod(campaign);
+                sc2ccm.Reset(campaignType);
             }
         }
         else
         {
-            var modsList = mods.Select(mod => mod.Title).Prepend(NoneItem).ToList();
+            var modsList = mods.Values.Select(mod => mod.Title).Prepend(NoneItem).ToList();
             ui.picker.ItemsSource = modsList;
-            var loaded = sc2ccm.Config.GetLoadedMod(campaign);
+            var loaded = sc2ccm.GetLoadedModTitle(campaignType);
             if (loaded == null && ui.picker.SelectedIndex != 0)
             {
                 ui.picker.SelectedIndex = 0;
@@ -115,29 +113,25 @@ public partial class MainPage : ContentPage
                 var index = modsList.IndexOf(loaded) - 1; // Account for "None Item" at beginning of list
                 if (index < 0 || index >= modsList.Count)
                 {
-                    sc2ccm.Config.SetLoadedMod(campaign, null);
                     ui.picker.SelectedIndex = 0;
-                    ClearMod(campaign);
+                    sc2ccm.Reset(campaignType);
                 }
                 else if (index + 1 != ui.picker.SelectedIndex)
                 {
-                    var mod = mods[index];
                     ui.picker.SelectedIndex = index + 1;
                 }
             }
         }
-        SyncCampaignTextDisplay(campaign);
-        ui.pickerHandler = MakeSelectedIndexChanged(campaign);
+        SyncCampaignTextDisplay(campaignType);
+        ui.pickerHandler = MakeSelectedIndexChanged(campaignType);
         ui.picker.SelectedIndexChanged += ui.pickerHandler;
     }
 
     private void ShowModList()
     {
-
-        var mods = sc2ccm.Mods().GroupBy(mod => mod.GetCampaign()).ToDictionary(group => group.Key, group => group.ToList());
         foreach (var (campaign, ui) in campaignUi)
         {
-            ui.picker.IsEnabled = sc2ccm.Config.ModsEnabled(campaign);
+            ui.picker.IsEnabled = sc2ccm.ModsEnabled(campaign);
             SyncCampaignDisplay(campaign);
         }
     }
@@ -165,50 +159,24 @@ public partial class MainPage : ContentPage
         MessageOutput.Children.Insert(0, newLabel);
     }
 
-    private EventHandler<ToggledEventArgs> MakeOnToggled(Campaign campaign)
+    private EventHandler<ToggledEventArgs> MakeOnToggled(CampaignType campaignType)
     {
         return (sender, e) =>
         {
-            sc2ccm.Config.SetModEnabled(campaign, e.Value);
-            campaignUi[campaign].picker.IsEnabled = e.Value;
             if (e.Value)
             {
-                LoadMod(campaign);
+                sc2ccm.EnableMods(campaignType);
             }
             else
             {
-                ClearMod(campaign);
+                sc2ccm.DisableMods(campaignType);
             }
+            campaignUi[campaignType].picker.IsEnabled = e.Value;
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                SyncCampaignDisplay(campaign);
+                SyncCampaignDisplay(campaignType);
             });
         };
-    }
-
-    private void ClearMod(Campaign campaign)
-    {
-        sc2ccm.Reset(campaign);
-    }
-
-    private void LoadMod(Campaign campaign)
-    {
-        var modTitleToLoad = sc2ccm.Config.GetLoadedMod(campaign);
-        if (modTitleToLoad == null)
-        {
-            ClearMod(campaign);
-            return;
-        }
-
-        var modsByTitle = sc2ccm.Mods().Where(mod => mod.GetCampaign() == campaign).ToDictionary(mod => mod.Title, mod => mod);
-        if (!modsByTitle.ContainsKey(modTitleToLoad))
-        {
-            sc2ccm.Config.SetLoadedMod(campaign, null);
-            ClearMod(campaign);
-            return;
-        }
-
-        sc2ccm.InstallMod(modsByTitle[modTitleToLoad]);
     }
 
     public async Task<FileResult?> PickAndShow(PickOptions options)

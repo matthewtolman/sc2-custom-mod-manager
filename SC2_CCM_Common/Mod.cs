@@ -9,41 +9,41 @@ namespace SC2_CCM_Common
         public string Title { get; set; } = "N/A";
         public string Author { get; set; } = "N/A";
         public string Desc { get; set; } = "N/A";
-        private Campaign _campaign;
+        private CampaignType _campaignType;
 
-        public Campaign GetCampaign()
+        public CampaignType GetCampaignType()
         {
-            return _campaign;
+            return _campaignType;
         }
 
-        public void SetCampaign(string campaign)
+        public void SetCampaignType(string campaign)
         {
             campaign = campaign.ToLower();
             if (CampaignNameContainsAnyOf(campaign, "wings", "liberty", "wol"))
             {
-                _campaign = Campaign.WingsOfLiberty;
+                _campaignType = CampaignType.WingsOfLiberty;
             }
             else if (CampaignNameContainsAnyOf(campaign, "heart", "swarm", "hots"))
             {
-                _campaign = Campaign.HeartOfTheSwarm;
+                _campaignType = CampaignType.HeartOfTheSwarm;
             }
             else if (CampaignNameContainsAnyOf(campaign, "legacy", "void", "lotv"))
             {
-                _campaign = Campaign.LegacyOfTheVoid;
+                _campaignType = CampaignType.LegacyOfTheVoid;
             }
             else if (CampaignNameContainsAnyOf(campaign, "nova", "covert", "ops", "nco"))
             {
-                _campaign = Campaign.NovaCovertOps;
+                _campaignType = CampaignType.NovaCovertOps;
             }
             else
             {
-                _campaign = Campaign.None;
+                _campaignType = CampaignType.None;
             }
         }
 
-        public void SetCampaign(Campaign campaign)
+        public void SetCampaignType(CampaignType campaignType)
         {
-            _campaign = campaign;
+            _campaignType = campaignType;
         }
 
         private bool CampaignNameContainsAnyOf(string campaign, params string[] searches)
@@ -81,7 +81,7 @@ namespace SC2_CCM_Common
                     mod.Desc = value;
                     break;
                 case "campaign":
-                    mod.SetCampaign(value);
+                    mod.SetCampaignType(value);
                     break;
                 case "version":
                     mod.Version = value;

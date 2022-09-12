@@ -40,11 +40,15 @@ namespace SC2_CCM_Common
             EnsureDirectoryExistsWithPerms("Maps", "Mods");
         }
 
-        public IEnumerable<bool> UnzipCustomCampaigns()
+        public void UnzipCustomCampaigns()
         {
-            return from f in Directory.GetFiles(CustomCampaignPath())
-                where f.EndsWith(".zip")
-                select UnzipCampaign(f);
+            foreach (var f in Directory.GetFiles(CustomCampaignPath()))
+            {
+                if (f.EndsWith(".zip"))
+                {
+                    UnzipCampaign(f);
+                }
+            }
         }
 
         private bool UnzipCampaign(string zipFile)
@@ -81,13 +85,15 @@ namespace SC2_CCM_Common
             return true;
         }
 
-        public IEnumerable<bool> HandleCustomCampaignDependencies()
+        public void HandleCustomCampaignDependencies()
         {
             var path = CustomCampaignPath();
             var pattern = "*.SC2Mod";
-            return Directory.GetFiles(path, pattern, SearchOption.AllDirectories)
-                .Concat(Directory.GetDirectories(path, pattern, SearchOption.AllDirectories))
-                .Select(dependency => HandleCampaignDependency(dependency));
+            foreach (var dependency in Directory.GetFiles(path, pattern, SearchOption.AllDirectories)
+                         .Concat(Directory.GetDirectories(path, pattern, SearchOption.AllDirectories)))
+            {
+                HandleCampaignDependency(dependency);
+            }
         }
 
         private string CustomCampaignPath()
@@ -99,13 +105,19 @@ namespace SC2_CCM_Common
         {
             return PathName("Maps", "CustomCampaigns", fileName);
         }
-        
-        public IEnumerable<Mod> ModList()
+
+        public Dictionary<CampaignType, Dictionary<string, Mod>> Mods { get; set; } = new Dictionary<CampaignType, Dictionary<string, Mod>>();
+
+        public void LoadMods()
         {
-            return from directory in Directory.GetDirectories(CustomCampaignPath(), "*", SearchOption.TopDirectoryOnly)
+            var modEnum =
+                from directory in Directory.GetDirectories(CustomCampaignPath(), "*", SearchOption.TopDirectoryOnly)
                 let dirInfo = new ModDirectoryInfo(directory)
                 where dirInfo.Validate(_messageProcessor)
-                    select Mod.From(dirInfo);
+                select Mod.From(dirInfo);
+            Mods = modEnum
+                .GroupBy(mod => mod.GetCampaignType())
+                .ToDictionary(g => g.Key, g => g.ToDictionary(m => m.Title));
         }
 
         public class CopyTo
@@ -203,7 +215,7 @@ namespace SC2_CCM_Common
                 {
                     File.Move(file, path);
                 }
-                _messageProcessor($"Moved \"{fileName} to Dependencies folder.");
+                _messageProcessor($"Moved \"{fileName} to Custom Campaigns folder.");
             }
             catch (IOException e)
             {
@@ -293,51 +305,51 @@ namespace SC2_CCM_Common
 
         public void Install(Mod mod)
         {
-            var campaignDir = CampaignDirectory(mod.GetCampaign());
+            var campaignDir = CampaignDirectory(mod.GetCampaignType());
             if (ClearDirectory(campaignDir))
             {
                 CopyFilesAndFolders(mod.Path, campaignDir);
-                _messageProcessor($"Installed mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaign())}\"");
+                _messageProcessor($"Installed mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\"");
             }
             else
             {
-                _messageProcessor($"ERROR: Could not install mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaign())}\" - SC2 Files in use!");
+                _messageProcessor($"ERROR: Could not install mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\" - SC2 Files in use!");
             }
         }
 
-        public void Reset(Campaign campaign)
+        public void Reset(CampaignType campaignType)
         {
-            var campaignDir = CampaignDirectory(campaign);
+            var campaignDir = CampaignDirectory(campaignType);
             if (ClearDirectory(campaignDir))
             {
-                _messageProcessor($"Campaign reset for \"{CampaignName(campaign)}\"");
+                _messageProcessor($"Campaign reset for \"{CampaignName(campaignType)}\"");
             }
             else
             {
-                _messageProcessor($"ERROR: Could not reset campaign \"{CampaignName(campaign)}\" - SC2 Files in use!");
+                _messageProcessor($"ERROR: Could not reset campaign \"{CampaignName(campaignType)}\" - SC2 Files in use!");
             }
         }
 
-        private string CampaignDirectory(Campaign campaign)
+        private string CampaignDirectory(CampaignType campaignType)
         {
-            return campaign switch
+            return campaignType switch
             {
-                Campaign.NovaCovertOps => PathName("Maps", "Campaign", "nova"),
-                Campaign.WingsOfLiberty => PathName("Maps", "Campaign"),
-                Campaign.HeartOfTheSwarm => PathName("Maps", "Campaign", "swarm"),
-                Campaign.LegacyOfTheVoid => PathName("Maps", "Campaign", "void"),
+                CampaignType.NovaCovertOps => PathName("Maps", "Campaign", "nova"),
+                CampaignType.WingsOfLiberty => PathName("Maps", "Campaign"),
+                CampaignType.HeartOfTheSwarm => PathName("Maps", "Campaign", "swarm"),
+                CampaignType.LegacyOfTheVoid => PathName("Maps", "Campaign", "void"),
                 _ => "Unknown"
             };
         }
 
-        private string CampaignName(Campaign campaign)
+        private string CampaignName(CampaignType campaignType)
         {
-            return campaign switch
+            return campaignType switch
             {
-                Campaign.NovaCovertOps => "Nova Covert Ops",
-                Campaign.WingsOfLiberty => "Wings of Liberty",
-                Campaign.HeartOfTheSwarm => "Heart of the Swarm",
-                Campaign.LegacyOfTheVoid => "Legacy of the Void",
+                CampaignType.NovaCovertOps => "Nova Covert Ops",
+                CampaignType.WingsOfLiberty => "Wings of Liberty",
+                CampaignType.HeartOfTheSwarm => "Heart of the Swarm",
+                CampaignType.LegacyOfTheVoid => "Legacy of the Void",
                 _ => "Unknown"
             };
         }

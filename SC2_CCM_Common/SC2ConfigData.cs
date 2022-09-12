@@ -9,7 +9,7 @@ namespace SC2_CCM_Common
         {}
 
         public string StarCraft2Exe { get; set; } = "";
-        public ImmutableDictionary<Campaign, ImmutableDictionary<String, String?>> ModSelectionInfo { get; set; } = ImmutableDictionary.Create<Campaign, ImmutableDictionary<String, String?>>();
+        public ImmutableDictionary<CampaignType, ImmutableDictionary<String, String?>> ModSelectionInfo { get; set; } = ImmutableDictionary.Create<CampaignType, ImmutableDictionary<String, String?>>();
     }
 }
 
