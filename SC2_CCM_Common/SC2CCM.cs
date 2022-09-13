@@ -35,6 +35,7 @@ namespace SC2_CCM_Common
 
         public void Load()
         {
+            Log.Logger.Debug("Running SC2CCM Load");
             _modFileSystem.EnsureDirectories();
             _modFileSystem.UnzipCustomCampaigns();
             _modFileSystem.HandleCustomCampaignDependencies();

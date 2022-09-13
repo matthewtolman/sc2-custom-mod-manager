@@ -120,6 +120,10 @@ public partial class MainPage : ContentPage
         var res = await PickAndShow(PickOptions.Default);
         if (res != null)
         {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                ShowMessage($"Importing {res.FileName}...");
+            });
             _sc2ccm.Import(res.FullPath);
             MainThread.BeginInvokeOnMainThread(UiRefresh);
         }

@@ -32,6 +32,7 @@ namespace SC2_CCM_Common
             var fullPath = Path.GetFullPath(Path.Combine(fullName, zipArchiveEntry.FullName));
             if (!fullPath.StartsWith(fullName, StringComparison.OrdinalIgnoreCase))
             {
+                Log.Logger.Error("Zip archive tried to extract files outside of destination directory! {Zip}", fullPath);
                 throw new IOException(
                     "Zip archive attempted to extract file(s) outside of destination directory! Stopping extraction. See this link for more info: https://snyk.io/research/zip-slip-vulnerability");
             }
@@ -39,6 +40,7 @@ namespace SC2_CCM_Common
             var dirName = Path.GetDirectoryName(fullPath);
             if (dirName == null)
             {
+                Log.Logger.Error("Could not determine directory name for zip {Zip}!", fullPath);
                 throw new IOException("Could not determine directory name for nested zip directory!");
             }
             else if (zipArchiveEntry.Name.Length == 0)

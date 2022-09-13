@@ -1,6 +1,8 @@
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using Serilog.Core;
 
 namespace SC2_CCM_Common
 {
@@ -37,6 +39,7 @@ namespace SC2_CCM_Common
             }
             else
             {
+                Log.Logger.Warning("Cannot find mod type for {CampaignType}", campaign);
                 _campaignType = CampaignType.None;
             }
         }
@@ -58,6 +61,7 @@ namespace SC2_CCM_Common
         {
             var mod = new Mod();
             var metadataFile = info.metadataTxt[0];
+            Log.Logger.Information("Loading mod from {MetadataFile}", metadataFile);
             foreach (var readLine in File.ReadLines(metadataFile))
             {
                 ProcessLine(readLine, ref mod);
@@ -90,6 +94,11 @@ namespace SC2_CCM_Common
                     mod.Author = value;
                     break;
             }
+        }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
         }
     }
 }

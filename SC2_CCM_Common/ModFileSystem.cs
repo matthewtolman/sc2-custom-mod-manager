@@ -23,7 +23,16 @@ namespace SC2_CCM_Common
             var dirPath = PathName(directoryPath);
             if (!Directory.Exists(dirPath))
             {
-                Directory.CreateDirectory(dirPath);
+                Log.Logger.Debug("Creating directory {Directory}", dirPath);
+                try
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Logger.Fatal(ex, "Could not create directory {Directory}", dirPath);
+                    throw;
+                }
             }
 
             var directoryInfo = new DirectoryInfo(dirPath);
@@ -63,6 +72,7 @@ namespace SC2_CCM_Common
                 {
                     using (ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Update))
                     {
+                        Log.Logger.Debug("Unzipping Campaign {ZipFile}", zipFile);
                         archive.ExtractToDirectory(PathName("Maps", "CustomCampaigns", noExtension));
                         _messageProcessor($"Unzipped \"{zipFile}\".");
                     }
@@ -70,16 +80,19 @@ namespace SC2_CCM_Common
             }
             catch (Exception)
             {
+                Log.Logger.Error("Could not unzip {ZipFile}", zipFile);
                 _messageProcessor($"ERROR: Could not unzip \"{zipFile}\"!");
                 return false;
             }
 
             try
             {
+                Log.Logger.Debug("Deleting {ZipFile}", zipFile);
                 File.Delete(zipFile);
             }
             catch (IOException)
             {
+                Log.Logger.Warning("Could not delete {ZipFile}", zipFile);
                 _messageProcessor($"Warning: Could not delete zip file \"{zipFile}\" - file in use.");
             }
 
@@ -146,6 +159,7 @@ namespace SC2_CCM_Common
         public void CopyFilesAndFolders(string sourcePath, params string[] destPath)
         {
             var targetPath = PathName(destPath);
+            Log.Logger.Debug("Copying from {SourcePath} to {DestPath}", sourcePath, targetPath);
             foreach (string directory in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
             {
                 Directory.CreateDirectory(directory.Replace(sourcePath, targetPath));
@@ -159,6 +173,7 @@ namespace SC2_CCM_Common
         public bool ClearDirectory(params string[] directory)
         {
             var dirPath = PathName(directory);
+            Log.Logger.Debug("Clearing Directory {Directory}", dirPath);
             return Directory.GetFiles(dirPath)
                 .Concat(
                     Directory.GetDirectories(dirPath, "*", SearchOption.TopDirectoryOnly)
@@ -201,6 +216,7 @@ namespace SC2_CCM_Common
             var path = PathName("Mods", fileName);
             if (!Delete(path))
             {
+                Log.Logger.Error("Could not move {File} to {Path}. Unable to delete existing file", file, path);
                 _messageProcessor($"ERROR: Could not replace \"{fileName}\" - exit StarCraft II and hit \"Reload\" to fix install properly.");
                 return false;
             }
@@ -216,10 +232,12 @@ namespace SC2_CCM_Common
                 {
                     File.Move(file, path);
                 }
+                Log.Logger.Debug("Moved {File} to {Path}", file, path);
                 _messageProcessor($"Moved \"{fileName} to Custom Campaigns folder.");
             }
             catch (IOException e)
             {
+                Log.Logger.Error(e, "Failed to move {File} to {Path}", file, path);
                 _messageProcessor($"ERROR: ERROR: Could not move \"{fileName}\". {e.Message}");
                 return false;
             }
@@ -243,8 +261,9 @@ namespace SC2_CCM_Common
                 {
                     File.Delete(path);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Log.Logger.Error(e, "Could not delete {File}", path);
                     return false;
                 }
             }
@@ -260,8 +279,9 @@ namespace SC2_CCM_Common
                 {
                     Directory.Delete(path, true);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Log.Logger.Error(e, "Could not delete {Directory}", path);
                     return false;
                 }
             }
@@ -278,14 +298,17 @@ namespace SC2_CCM_Common
         {
             if (path.ToLower().EndsWith(".zip"))
             {
+                Log.Logger.Information("Importing {Mod} as zip", path);
                 ImportZip(path);
             }
             else if (!Path.HasExtension(path))
             {
+                Log.Logger.Information("Importing {Mod} as extensionless", path);
                 ImportExtensionless(path);
             }
             else
             {
+                Log.Logger.Error("Unable to determine how to import {Mod}", path);
                 _messageProcessor($"ERROR: Could not import \"{path}\". Please make sure it is a zip file!");
             }
         }
@@ -309,11 +332,13 @@ namespace SC2_CCM_Common
             var campaignDir = CampaignDirectory(mod.GetCampaignType());
             if (ClearDirectory(campaignDir))
             {
+                Log.Logger.Information("Installing {Mod}", mod);
                 CopyFilesAndFolders(mod.Path, campaignDir);
                 _messageProcessor($"Installed mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\"");
             }
             else
             {
+                Log.Logger.Information("Could not install mod {Mod}, unable to clear {Dir}", mod, campaignDir);
                 _messageProcessor($"ERROR: Could not install mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\" - SC2 Files in use!");
             }
         }
@@ -323,10 +348,12 @@ namespace SC2_CCM_Common
             var campaignDir = CampaignDirectory(campaignType);
             if (ClearDirectory(campaignDir))
             {
+                Log.Logger.Information("Resetting campaign for {Campaign}", campaignType);
                 _messageProcessor($"Campaign reset for \"{CampaignName(campaignType)}\"");
             }
             else
             {
+                Log.Logger.Error("Failed to reset {Campaign}, unable to clear {Dir}", campaignType, campaignDir);
                 _messageProcessor($"ERROR: Could not reset campaign \"{CampaignName(campaignType)}\" - SC2 Files in use!");
             }
         }

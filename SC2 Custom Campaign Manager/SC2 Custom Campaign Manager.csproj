@@ -50,4 +50,8 @@
     <ItemGroup>
       <ProjectReference Include="..\SC2_CCM_Common\SC2_CCM_Common.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    </ItemGroup>
 </Project>

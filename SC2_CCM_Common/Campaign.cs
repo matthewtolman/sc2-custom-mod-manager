@@ -41,6 +41,7 @@ public class Campaign
         _sc2ccm = sc2Ccm;
         Type = type;
         _noOption = new ModOption(null, Type);
+        Log.Logger.Information("Created campaign object for {Campaign}", type);
     }
 
     public CampaignType Type { get; }
@@ -85,6 +86,7 @@ public class Campaign
 
     public void SelectOption(ModOption? modOption)
     {
+        Log.Logger.Information("Selected Mod {ModOption} for {Campaign}", modOption, Type);
         if (modOption?.Mod == null || !ModsEnabled)
         {
             _sc2ccm.Reset(Type);
@@ -97,11 +99,13 @@ public class Campaign
 
     public void DisableMods()
     {
+        Log.Logger.Information("Turned off mods for {Campaign}", Type);
         _sc2ccm.DisableMods(Type);
     }
 
     public void EnableMods()
     {
+        Log.Logger.Information("Turned on mods for {Campaign}", Type);
         _sc2ccm.EnableMods(Type);
     }
 }
