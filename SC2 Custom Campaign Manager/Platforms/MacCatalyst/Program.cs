@@ -13,6 +13,24 @@ public class Program
     {
         var logFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Path.Combine("SC2CCM", "SC2CCM.log"));
+
+        try
+        {
+            if (File.Exists(logFile))
+            {
+                var oldLogFile = logFile + ".old";
+                if (File.Exists(oldLogFile))
+                {
+                    File.Delete(oldLogFile);
+                }
+                File.Move(logFile, oldLogFile);
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("Failed to rotate logs! " + e.Message);
+        }
+
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File(
                 logFile,
