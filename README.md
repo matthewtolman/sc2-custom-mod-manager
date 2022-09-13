@@ -1,4 +1,4 @@
-## StarCraft II Custom Campaign Mod Manager
+# StarCraft II Custom Campaign Mod Manager
 
 This is a work-in-progress cross-platform custom campaign mod manager for StarCraft II based on the awesome work of the GiantGrantGames community.
 GiantGrantGames and his community have come up with a custom campaign mod manager that allows modders to use the standard campaign UI for custom campaigns.
@@ -7,6 +7,9 @@ They have developed and freely released their mod manager, however their mod man
 This mod manager aims to work on both Mac and Windows as both platforms are officially supported by Blizzard for StarCraft II.
 
 Currently only Mac on Intel processors has been tested and verified.
+
+## MAUI UI
+
 
 ### Build Requirements
 
@@ -36,6 +39,35 @@ To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-
 
 ### Windows
 To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:Release`
+
+## Avalonia UI
+
+### Build Requirements
+
+The simplest setup is to install Visual Studio and add C# (make sure you're version of visual studio supports .NET 6).
+However, if you don't want to install Visual Studio, then you can install just the .NET CLI and go from there.
+
+This project requires .NET 6 to be installed.
+To get everything setup, do the following:
+
+* Go to https://dotnet.microsoft.com/en-us/download and install .NET 6
+* Once that finishes, run `dotnet run --project SC2_Avalonia_UI -c:Release` to launch the program
+
+## Building
+
+### Mac
+To build, run `dotnet run --project SC2_Avalonia_UI -r:osx-x64 -c:Release`
+
+To create a pkg file, run `dotnet build SC2_Avalonia_UI -r:osx-x64 -c:Release`
+
+#### Local publishing
+
+* Run `rm -rf out/avalon && dotnet restore -r osx-x64 && dotnet publish SC2_Avalonia_UI -c:Release -o out/avalon --sc --nologo -r:osx-x64 -p:PublishSingleFile=true`
+
+#### Packaging
+
+### Windows
+To build, run `dotnet build SC2_Avalonia_UI -f:net6.0-windows -c:Release`
 
 ## Features
 

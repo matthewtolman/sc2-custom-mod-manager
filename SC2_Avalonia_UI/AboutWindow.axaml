@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="390"
+        Width="350"
+        Height="390"
+        x:Class="SC2_Avalonia_UI.AboutWindow"
+        Title="AboutWindow">
+    <ScrollViewer>
+        <StackPanel Spacing="15" Margin="8">
+            <Label FontSize="20" x:Name="AboutLabel">About</Label>
+            <TextBlock TextWrapping="Wrap">
+This program was developed by Matt Tolman. It is inspired by the Custom Campaign Manager developed by the GiantGrantGames community. Their manager is awesome and highly recommended, but it only works on Windows. StarCraft II works on both Windows and Mac, so there are some gamers who cannot use the GiantGrantGames campaign manager.
+
+This program is meant to fill that void and allow players on both platforms to be able to experience the awesomeness that is the mods developed by the GiantGrantGames community.
+
+In the spirit of the GiantGrantGames community, this program is made freely available to all. I've also published the source code at https://github.com/matthewtolman/sc2-custom-mod-manager.
+            </TextBlock>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

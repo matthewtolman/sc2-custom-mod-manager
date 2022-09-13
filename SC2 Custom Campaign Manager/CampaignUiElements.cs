@@ -5,15 +5,16 @@ namespace SC2_Custom_Campaign_Manager
     {
         public Switch @switch;
         public Picker picker;
+        public Label campaignName;
         public Label authorLabel;
         public Label descriptionLabel;
         public VerticalStackLayout pane;
-        public EventHandler? pickerHandler;
 
-        public CampaignUiElements(Switch @switch, Picker picker, Label authorLabel, Label descriptionLabel, VerticalStackLayout pane)
+        public CampaignUiElements(Switch @switch, Picker picker, Label campaignName, Label authorLabel, Label descriptionLabel, VerticalStackLayout pane)
         {
             this.@switch = @switch;
             this.picker = picker;
+            this.campaignName = campaignName;
             this.authorLabel = authorLabel;
             this.descriptionLabel = descriptionLabel;
             this.pane = pane;
