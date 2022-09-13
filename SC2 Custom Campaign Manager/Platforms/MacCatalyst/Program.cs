@@ -6,19 +6,24 @@ using Log = SC2_CCM_Common.Log;
 
 namespace SC2_Custom_Campaign_Manager;
 
+/// <summary>
+/// Main program for Mac
+/// </summary>
 public class Program
 {
     // This is the main entry point of the application.
     static void Main(string[] args)
     {
+        // Select our log file
         var logFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             Path.Combine("SC2CCM", "SC2CCM.log"));
 
+        // Rotate away the old log file (keep a history of 1)
         try
         {
             if (File.Exists(logFile))
             {
-                var oldLogFile = logFile + ".old";
+                var oldLogFile = $"{logFile}.old";
                 if (File.Exists(oldLogFile))
                 {
                     File.Delete(oldLogFile);
@@ -31,6 +36,7 @@ public class Program
             Console.WriteLine("Failed to rotate logs! " + e.Message);
         }
 
+        // Initialize our logger
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File(
                 logFile,
@@ -49,6 +55,7 @@ public class Program
         }
         catch (Exception ex)
         {
+            // Make sure we log program crashes
             Log.Logger.Fatal(ex, "Program Crash Detected!");
         }
     }

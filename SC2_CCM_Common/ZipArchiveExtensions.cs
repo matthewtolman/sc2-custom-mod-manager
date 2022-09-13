@@ -5,28 +5,34 @@ using System.Linq;
 
 namespace SC2_CCM_Common
 {
+    /// <summary>
+    /// Extensions for Zip Archives
+    /// </summary>
     public static class ZipArchiveExtensions
     {
+        /// <summary>
+        /// Extracts a zip archive to a directory
+        /// </summary>
+        /// <param name="archive"></param>
+        /// <param name="destinationDirectory"></param>
         public static void ExtractToDirectory(
             this ZipArchive archive,
-            string destinationDirectory,
-            bool overwrite = true
+            string destinationDirectory
         )
         {
-            if (!overwrite)
+            string fullName = Directory.CreateDirectory(destinationDirectory).FullName;
+            foreach (var zipArchiveEntry in archive.Entries)
             {
-                archive.ExtractToDirectory(destinationDirectory);
-            }
-            else
-            {
-                string fullName = Directory.CreateDirectory(destinationDirectory).FullName;
-                foreach (var zipArchiveEntry in archive.Entries)
-                {
-                    ExtractEntry(fullName, zipArchiveEntry);
-                }
+                ExtractEntry(fullName, zipArchiveEntry);
             }
         }
 
+        /// <summary>
+        /// Extracts a zip entry to a specific location
+        /// </summary>
+        /// <param name="fullName"></param>
+        /// <param name="zipArchiveEntry"></param>
+        /// <exception cref="IOException"></exception>
         private static void ExtractEntry(string fullName, ZipArchiveEntry zipArchiveEntry)
         {
             var fullPath = Path.GetFullPath(Path.Combine(fullName, zipArchiveEntry.FullName));

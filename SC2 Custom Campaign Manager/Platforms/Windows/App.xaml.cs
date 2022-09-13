@@ -16,6 +16,7 @@ public partial class App : MauiWinUIApplication
     /// </summary>
     public App()
     {
+        /// TODO: Setup logging
         this.InitializeComponent();
     }
 

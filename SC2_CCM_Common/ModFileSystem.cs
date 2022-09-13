@@ -1,26 +1,52 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 
 namespace SC2_CCM_Common
 {
+    /// <summary>
+    /// Manages file system operations for a mod
+    /// </summary>
     public class ModFileSystem
     {
+        /// <summary>
+        /// Message processor for user-facing messages
+        /// </summary>
         private readonly Action<string> _messageProcessor;
+        
+        /// <summary>
+        /// Configuration object
+        /// </summary>
         private readonly SC2Config _config;
-        public string Sc2BasePath => _config.StarCraft2Dir;
+        
+        /// <summary>
+        /// Base path for all files that go in SC2 directory
+        /// </summary>
+        private string Sc2BasePath => _config.StarCraft2Dir;
 
+        /// <summary>
+        /// Dictionary of campaign types to a dictionary of titles to mods
+        /// </summary>
+        public Dictionary<CampaignType, Dictionary<string, Mod>> Mods { get; set; } = new();
+
+        /// <summary>
+        /// Create a mod file system object
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="messageProcessor"></param>
         public ModFileSystem(SC2Config config, Action<string> messageProcessor)
         {
             this._config = config;
             this._messageProcessor = messageProcessor;
         }
 
+        /// <summary>
+        /// Ensures a specified directory exists and is writable
+        /// </summary>
+        /// <param name="directoryPath">
+        /// Path for the directory
+        /// </param>
         private void EnsureDirectoryExistsWithPerms(params string[] directoryPath)
         {
-            var dirPath = PathName(directoryPath);
+            var dirPath = PathRelToSc2(directoryPath);
             if (!Directory.Exists(dirPath))
             {
                 Log.Logger.Debug("Creating directory {Directory}", dirPath);
@@ -39,6 +65,9 @@ namespace SC2_CCM_Common
             directoryInfo.Attributes &= ~FileAttributes.ReadOnly;
         }
 
+        /// <summary>
+        /// Ensures the map directories exist for StarCraft II
+        /// </summary>
         public void EnsureDirectories()
         {
             EnsureDirectoryExistsWithPerms("Maps");
@@ -50,6 +79,9 @@ namespace SC2_CCM_Common
             EnsureDirectoryExistsWithPerms("Maps", "Mods");
         }
 
+        /// <summary>
+        /// Unzips all zipped custom campaigns
+        /// </summary>
         public void UnzipCustomCampaigns()
         {
             foreach (var f in Directory.GetFiles(CustomCampaignPath()))
@@ -61,30 +93,33 @@ namespace SC2_CCM_Common
             }
         }
 
-        private bool UnzipCampaign(string zipFile)
+        /// <summary>
+        /// Unzips a single campaign zip file
+        /// </summary>
+        /// <param name="zipFile"></param>
+        private void UnzipCampaign(string zipFile)
         {
             string noExtension = Path.GetFileNameWithoutExtension(zipFile);
             File.SetAttributes(zipFile, FileAttributes.Normal);
 
+            // Unzip
             try
             {
-                using (FileStream fileStream = new FileStream(zipFile, FileMode.Open))
-                {
-                    using (ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Update))
-                    {
-                        Log.Logger.Debug("Unzipping Campaign {ZipFile}", zipFile);
-                        archive.ExtractToDirectory(PathName("Maps", "CustomCampaigns", noExtension));
-                        _messageProcessor($"Unzipped \"{zipFile}\".");
-                    }
-                }
+                using var fileStream = new FileStream(zipFile, FileMode.Open);
+                using var archive = new ZipArchive(fileStream, ZipArchiveMode.Update);
+
+                Log.Logger.Debug("Unzipping Campaign {ZipFile}", zipFile);
+                archive.ExtractToDirectory(PathRelToSc2("Maps", "CustomCampaigns", noExtension));
+                _messageProcessor($"Unzipped \"{zipFile}\".");
             }
             catch (Exception)
             {
                 Log.Logger.Error("Could not unzip {ZipFile}", zipFile);
                 _messageProcessor($"ERROR: Could not unzip \"{zipFile}\"!");
-                return false;
+                return;
             }
 
+            // Cleanup
             try
             {
                 Log.Logger.Debug("Deleting {ZipFile}", zipFile);
@@ -95,10 +130,11 @@ namespace SC2_CCM_Common
                 Log.Logger.Warning("Could not delete {ZipFile}", zipFile);
                 _messageProcessor($"Warning: Could not delete zip file \"{zipFile}\" - file in use.");
             }
-
-            return true;
         }
 
+        /// <summary>
+        /// Handles custom campaign dependencies
+        /// </summary>
         public void HandleCustomCampaignDependencies()
         {
             var path = CustomCampaignPath();
@@ -110,18 +146,28 @@ namespace SC2_CCM_Common
             }
         }
 
+        /// <summary>
+        /// Gets the path for custom campaigns
+        /// </summary>
+        /// <returns></returns>
         private string CustomCampaignPath()
         {
-            return PathName("Maps", "CustomCampaigns");
+            return PathRelToSc2("Maps", "CustomCampaigns");
         }
 
+        /// <summary>
+        /// Gets the custom campaign path for a file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private string CustomCampaignPath(string fileName)
         {
-            return PathName("Maps", "CustomCampaigns", fileName);
+            return PathRelToSc2("Maps", "CustomCampaigns", fileName);
         }
 
-        public Dictionary<CampaignType, Dictionary<string, Mod>> Mods { get; set; } = new Dictionary<CampaignType, Dictionary<string, Mod>>();
-
+        /// <summary>
+        /// Loads all available mods into the Mods property
+        /// </summary>
         public void LoadMods()
         {
             var modEnum =
@@ -130,35 +176,18 @@ namespace SC2_CCM_Common
                 where dirInfo.Validate(_messageProcessor)
                 select Mod.From(dirInfo);
             Mods = modEnum
-                .GroupBy(mod => mod.GetCampaignType())
+                .GroupBy(mod => mod.CampaignType)
                 .ToDictionary(g => g.Key, g => g.ToDictionary(m => m.Title));
         }
 
-        public class CopyTo
+        /// <summary>
+        /// Copies files and folders from a source path to a dest path
+        /// </summary>
+        /// <param name="sourcePath">Source path</param>
+        /// <param name="destPath">Destination path pieces</param>
+        private void CopyFilesAndFolders(string sourcePath, params string[] destPath)
         {
-            private ModFileSystem _modFileSystem;
-            private string _source;
-
-            public CopyTo(ModFileSystem modFileSystem, string source)
-            {
-                _modFileSystem = modFileSystem;
-                _source = source;
-            }
-
-            public void To(params string[] destPath)
-            {
-                _modFileSystem.CopyFilesAndFolders(_source, destPath);
-            }
-        }
-
-        public CopyTo CopyFrom(string sourcePath)
-        {
-            return new CopyTo(this, sourcePath);
-        }
-
-        public void CopyFilesAndFolders(string sourcePath, params string[] destPath)
-        {
-            var targetPath = PathName(destPath);
+            var targetPath = PathRelToSc2(destPath);
             Log.Logger.Debug("Copying from {SourcePath} to {DestPath}", sourcePath, targetPath);
             foreach (string directory in Directory.GetDirectories(sourcePath, "*", SearchOption.AllDirectories))
             {
@@ -170,17 +199,22 @@ namespace SC2_CCM_Common
             }
         }
 
-        public bool ClearDirectory(params string[] directory)
+        /// <summary>
+        /// Clears all files from a directory
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <returns></returns>
+        private bool ClearDirectory(params string[] directory)
         {
-            var dirPath = PathName(directory);
+            var dirPath = PathRelToSc2(directory);
             Log.Logger.Debug("Clearing Directory {Directory}", dirPath);
             return Directory.GetFiles(dirPath)
                 .Concat(
                     Directory.GetDirectories(dirPath, "*", SearchOption.TopDirectoryOnly)
                         .Where(Functional.And(
-                            NotDirNameContainsPath("Campaign", "swarm"),
-                            NotDirNameContainsPath("Campaign", "void"),
-                            NotDirNameContainsPath("Campaign", "nova")
+                            DirPathDoesNotContain("Campaign", "swarm"),
+                            DirPathDoesNotContain("Campaign", "void"),
+                            DirPathDoesNotContain("Campaign", "nova")
                         ))
                 )
                 .All(file =>
@@ -196,29 +230,48 @@ namespace SC2_CCM_Common
                 });
         }
 
-        private Func<string, bool> NotDirNameContainsPath(params string[] pathSegments)
+        /// <summary>
+        /// Returns a method which checks whether a directory path does not contain a path
+        /// </summary>
+        /// <param name="pathSegments">Path segments to check against</param>
+        /// <returns></returns>
+        private static Func<string, bool> DirPathDoesNotContain(params string[] pathSegments)
         {
             return dir => !dir.Contains(Path.Combine(pathSegments));
         }
 
-        private bool Delete(string path)
+        /// <summary>
+        /// Deletes a file or directory
+        /// </summary>
+        /// <param name="path">Path of file or directory</param>
+        /// <returns></returns>
+        private static bool Delete(string path)
         {
             return DeleteDirectoryIfExists(path) && DeleteFileIfExists(path);
         }
 
-        private bool HandleCampaignDependency(string dependency)
+        /// <summary>
+        /// Handles moving a campaign's dependency
+        /// </summary>
+        /// <param name="dependency"></param>
+        private void HandleCampaignDependency(string dependency)
         {
-            return Move(Path.GetFileName(dependency), dependency);
+            Move(dependency);
         }
 
-        private bool Move(string fileName, string file)
+        /// <summary>
+        /// Moves a file into our Mod directory
+        /// </summary>
+        /// <param name="file">File to move</param>
+        private void Move(string file)
         {
-            var path = PathName("Mods", fileName);
+            var fileName = Path.GetFileName(file);
+            var path = PathRelToSc2("Mods", fileName);
             if (!Delete(path))
             {
                 Log.Logger.Error("Could not move {File} to {Path}. Unable to delete existing file", file, path);
                 _messageProcessor($"ERROR: Could not replace \"{fileName}\" - exit StarCraft II and hit \"Reload\" to fix install properly.");
-                return false;
+                return;
             }
 
 
@@ -239,21 +292,26 @@ namespace SC2_CCM_Common
             {
                 Log.Logger.Error(e, "Failed to move {File} to {Path}", file, path);
                 _messageProcessor($"ERROR: ERROR: Could not move \"{fileName}\". {e.Message}");
-                return false;
             }
-
-            return true;
         }
 
-
-        private bool IsDirectory(string file)
+        /// <summary>
+        /// Checks if a path is a directory or not
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        private static bool IsDirectory(string file)
         {
             var attrs = File.GetAttributes(file);
             return (attrs & FileAttributes.Directory) != 0;
         }
 
-
-        private bool DeleteFileIfExists(string path)
+        /// <summary>
+        /// Deletes a file if it exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static bool DeleteFileIfExists(string path)
         {
             if (File.Exists(path))
             {
@@ -271,6 +329,11 @@ namespace SC2_CCM_Common
             return true;
         }
 
+        /// <summary>
+        /// Deletes a directory if it exists
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private static bool DeleteDirectoryIfExists(string path)
         {
             if (Directory.Exists(path))
@@ -289,11 +352,20 @@ namespace SC2_CCM_Common
             return true;
         }
 
-        private string PathName(params string[] path)
+        /// <summary>
+        /// Converts path segments into a file path relative to the StarCraft II folder
+        /// </summary>
+        /// <param name="pathSegments">Path segments to convert into a path</param>
+        /// <returns></returns>
+        private string PathRelToSc2(params string[] pathSegments)
         {
-            return Path.Combine(path.Prepend(Sc2BasePath).ToArray());
+            return Path.Combine(pathSegments.Prepend(Sc2BasePath).ToArray());
         }
 
+        /// <summary>
+        /// Imports a file as a mod
+        /// </summary>
+        /// <param name="path">Path to a zip file</param>
         public void Import(string path)
         {
             if (path.ToLower().EndsWith(".zip"))
@@ -313,71 +385,80 @@ namespace SC2_CCM_Common
             }
         }
 
+        /// <summary>
+        /// Import an extensionless file
+        /// </summary>
+        /// <param name="path"></param>
         private void ImportExtensionless(string path)
         {
             var destPath = CustomCampaignPath(Path.GetFileName(path));
             EnsureDirectoryExistsWithPerms(destPath);
-            CopyFrom(path).To(destPath);
+            CopyFilesAndFolders(path, destPath);
             Delete(path);
         }
 
+        /// <summary>
+        /// Import a zip file
+        /// </summary>
+        /// <param name="path"></param>
         private void ImportZip(string path)
         {
             var destFile = CustomCampaignPath(Path.GetFileName(path));
             File.Copy(path, destFile);
         }
 
+        /// <summary>
+        /// Install a mod into StarCraft II
+        /// </summary>
+        /// <param name="mod"></param>
         public void Install(Mod mod)
         {
-            var campaignDir = CampaignDirectory(mod.GetCampaignType());
+            var campaignDir = CampaignDirectory(mod.CampaignType);
             if (ClearDirectory(campaignDir))
             {
                 Log.Logger.Information("Installing {Mod}", mod);
                 CopyFilesAndFolders(mod.Path, campaignDir);
-                _messageProcessor($"Installed mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\"");
+                _messageProcessor($"Installed mod \"{mod.Title}\" for Campaign \"{Campaign.CampaignName(mod.CampaignType)}\"");
             }
             else
             {
                 Log.Logger.Information("Could not install mod {Mod}, unable to clear {Dir}", mod, campaignDir);
-                _messageProcessor($"ERROR: Could not install mod \"{mod.Title}\" for Campaign \"{CampaignName(mod.GetCampaignType())}\" - SC2 Files in use!");
+                _messageProcessor($"ERROR: Could not install mod \"{mod.Title}\" for Campaign \"{Campaign.CampaignName(mod.CampaignType)}\" - SC2 Files in use!");
             }
         }
 
+        /// <summary>
+        /// Resets a StarCraft II campaign to be a default campaign
+        /// </summary>
+        /// <param name="campaignType"></param>
         public void Reset(CampaignType campaignType)
         {
             var campaignDir = CampaignDirectory(campaignType);
             if (ClearDirectory(campaignDir))
             {
-                Log.Logger.Information("Resetting campaign for {Campaign}", campaignType);
-                _messageProcessor($"Campaign reset for \"{CampaignName(campaignType)}\"");
+                Log.Logger.Information("Resetting campaign for {Campaign}", Campaign.CampaignName(campaignType));
+                _messageProcessor($"Campaign reset for \"{Campaign.CampaignName(campaignType)}\"");
             }
             else
             {
-                Log.Logger.Error("Failed to reset {Campaign}, unable to clear {Dir}", campaignType, campaignDir);
-                _messageProcessor($"ERROR: Could not reset campaign \"{CampaignName(campaignType)}\" - SC2 Files in use!");
+                Log.Logger.Error("Failed to reset {Campaign}, unable to clear {Dir}", Campaign.CampaignName(campaignType), campaignDir);
+                _messageProcessor($"ERROR: Could not reset campaign \"{Campaign.CampaignName(campaignType)}\" - SC2 Files in use!");
             }
         }
 
+        /// <summary>
+        /// Returns the directory for a campaign type
+        /// </summary>
+        /// <param name="campaignType"></param>
+        /// <returns></returns>
         private string CampaignDirectory(CampaignType campaignType)
         {
             return campaignType switch
             {
-                CampaignType.NovaCovertOps => PathName("Maps", "Campaign", "nova"),
-                CampaignType.WingsOfLiberty => PathName("Maps", "Campaign"),
-                CampaignType.HeartOfTheSwarm => PathName("Maps", "Campaign", "swarm"),
-                CampaignType.LegacyOfTheVoid => PathName("Maps", "Campaign", "void"),
-                _ => "Unknown"
-            };
-        }
-
-        private string CampaignName(CampaignType campaignType)
-        {
-            return campaignType switch
-            {
-                CampaignType.NovaCovertOps => "Nova Covert Ops",
-                CampaignType.WingsOfLiberty => "Wings of Liberty",
-                CampaignType.HeartOfTheSwarm => "Heart of the Swarm",
-                CampaignType.LegacyOfTheVoid => "Legacy of the Void",
+                CampaignType.NovaCovertOps => PathRelToSc2("Maps", "Campaign", "nova"),
+                CampaignType.WingsOfLiberty => PathRelToSc2("Maps", "Campaign"),
+                CampaignType.HeartOfTheSwarm => PathRelToSc2("Maps", "Campaign", "swarm"),
+                CampaignType.LegacyOfTheVoid => PathRelToSc2("Maps", "Campaign", "void"),
                 _ => "Unknown"
             };
         }

@@ -1,41 +1,129 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SC2_CCM_Common
 {
+    /// <summary>
+    /// Represents Configuration for SC2 CCM
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class SC2Config
     {
-        private static string _legacyConfigPath =
+        /// <summary>
+        /// Default legacy config path
+        /// </summary>
+        private static string LegacyConfigPath =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 Path.Combine("SC2CCM", "SC2CCM.txt"));
         
-        private static string _newConfigPath =
+        /// <summary>
+        /// Default new config path
+        /// </summary>
+        private static string NewConfigPath =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 Path.Combine("SC2CCM", "SC2CCM.json"));
 
-        private SC2ConfigData _data = new SC2ConfigData();
+        /// <summary>
+        /// Current legacy config path for SC2Config object
+        /// </summary>
+        private readonly string _legacyConfigPath;
+        
+        /// <summary>
+        /// Current new config path for SC2Config object
+        /// </summary>
+        private readonly string _newConfigPath;
+        
+        /// <summary>
+        /// Underlying data for SC2Config
+        /// </summary>
+        private readonly SC2ConfigData _data;
 
+        /// <summary>
+        /// StarCraft II Executable directory
+        /// </summary>
         public string StarCraft2Dir => Path.GetDirectoryName(_data.StarCraft2Exe)!;
+        
+        /// <summary>
+        /// StarCraft II Executable
+        /// </summary>
         public string StarCraft2Exe => _data.StarCraft2Exe;
 
-        public ImmutableDictionary<CampaignType, ImmutableDictionary<String, String?>> ModSelectionInfo
+        /// <summary>
+        /// Convenience wrapper around mod selection info which also does automatic saves on change
+        /// </summary>
+        private ImmutableDictionary<CampaignType, ImmutableDictionary<String, String?>> ModSelectionInfo
         {
             get => _data.ModSelectionInfo;
-            private set
+            set
             {
                 _data.ModSelectionInfo = value;
                 Save();
             }
         }
         
-        private SC2Config(SC2ConfigData data)
+        /// <summary>
+        /// Constructor for SC2Config
+        /// </summary>
+        /// <param name="data">Underlying data</param>
+        /// <param name="legacyConfigPath">Legacy config file path</param>
+        /// <param name="newConfigPath">New config file path</param>
+        private SC2Config(SC2ConfigData data, string legacyConfigPath, string newConfigPath)
         {
             _data = data;
+            _legacyConfigPath = legacyConfigPath;
+            _newConfigPath = newConfigPath;
+        }
+
+        /// <summary>
+        /// Sets the currently loaded campaign mod for the given campaign type
+        /// </summary>
+        /// <param name="campaignType"></param>
+        /// <param name="modName"></param>
+        public void SetLoadedMod(CampaignType campaignType, string? modName)
+        {
+            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
+                ModSelectionInfo[campaignType].SetItem("mod", modName));
+        }
+
+        /// <summary>
+        /// Returns whether campaign mods are enabled for the given campaign type
+        /// </summary>
+        /// <param name="campaignType"></param>
+        /// <returns></returns>
+        public bool ModsEnabled(CampaignType campaignType)
+        {
+            return ModSelectionInfo[campaignType]["enabled"] == "on";
+        }
+
+        /// <summary>
+        /// Sets whether mods are enabled for the given campaign type
+        /// </summary>
+        /// <param name="campaignType"></param>
+        /// <param name="enabled"></param>
+        public void SetModEnabled(CampaignType campaignType, bool enabled)
+        {
+            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
+                ModSelectionInfo[campaignType].SetItem("enabled", enabled ? "on" : "off"));
+        }
+
+        /// <summary>
+        /// Gets the loaded mod for the given campaign type
+        /// </summary>
+        /// <param name="campaignType"></param>
+        /// <returns></returns>
+        public string? GetLoadedMod(CampaignType campaignType)
+        {
+            return ModSelectionInfo[campaignType]["mod"];
         }
         
-
-        private static SC2Config NewConfig(string path)
+        /// <summary>
+        /// Returns a new, blank configuration
+        /// </summary>
+        /// <param name="starCraft2Path">Path to StarCraft II Executable</param>
+        /// <param name="legacyConfigPath">Path for legacy configuration file</param>
+        /// <param name="newConfigPath">Path for new configuration file</param>
+        /// <returns></returns>
+        private static SC2Config NewConfig(string starCraft2Path, string legacyConfigPath, string newConfigPath)
         {
             ImmutableDictionary<string, string?> MakeDictEntry() => ImmutableDictionary.Create<String, String?>().Add("enabled", "off").Add("mod", null);
 
@@ -45,14 +133,19 @@ namespace SC2_CCM_Common
                 .Add(CampaignType.LegacyOfTheVoid, MakeDictEntry())
                 .Add(CampaignType.NovaCovertOps, MakeDictEntry());
 
-            var data = new SC2ConfigData();
-            data.StarCraft2Exe = path;
-            data.ModSelectionInfo = blankConfig;
-            
-            return (new SC2Config(data));
+            var data = new SC2ConfigData
+            {
+                StarCraft2Exe = starCraft2Path,
+                ModSelectionInfo = blankConfig
+            };
+
+            return new SC2Config(data, legacyConfigPath, newConfigPath);
         }
 
-        public bool Save()
+        /// <summary>
+        /// Saves the current configuration
+        /// </summary>
+        private void Save()
         {
             try
             {
@@ -64,107 +157,122 @@ namespace SC2_CCM_Common
             {
                 Log.Logger.Error(e, "Could not save config!");
                 Console.WriteLine($"Unable to save! {e.Message}; {e.StackTrace}");
-                return false;
             }
-
-            return true;
         }
 
-        private static async Task<SC2Config> InitBlankConfig(Func<Task<string>> fallbackPathFinder, int retryCount)
+        /// <summary>
+        /// Initializes a blank configuration and saves it to disk. Also handles auto-detecting the StarCraft II executable
+        /// </summary>
+        /// <param name="fallbackPathFinder">Fallback path finder in case auto-detect fails to find StarCraft II</param>
+        /// <param name="legacyPath">Legacy configuration file path</param>
+        /// <param name="newPath">New configuration file path</param>
+        /// <returns>Configuration object</returns>
+        /// <exception cref="ModManagerException"></exception>
+        private static async Task<SC2Config> InitBlankConfig(Func<Task<string>> fallbackPathFinder, string legacyPath, string newPath)
         {
             Log.Logger.Warning("Initializing from blank config");
-            if (!File.Exists(_legacyConfigPath))
+            try
             {
-                try
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(_legacyConfigPath)!);
-                }
-                catch (IOException)
-                {
-                    throw new ModManagerException("Unable to create configuration file/folder\nTry running this as administrator.");
-                }
+                Directory.CreateDirectory(Path.GetDirectoryName(legacyPath)!);
+            }
+            catch (IOException e)
+            {
+                Log.Logger.Error(e, "Could not create configuration file!");
+                throw new ModManagerException("Unable to create configuration file/folder\nTry running this as administrator.");
+            }
 #if WINDOWS
-                try
+            try
+            {
+                using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software\\Classes\\Blizzard.SC2Save\\shell\\open\\command"))
                 {
-                    using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software\\Classes\\Blizzard.SC2Save\\shell\\open\\command"))
+                    if (registryKey != null)
                     {
-                        if (registryKey != null)
+                        object obj = registryKey.GetValue((string) null);
+                        if (obj != null)
                         {
-                            object obj = registryKey.GetValue((string) null);
-                            if (obj != null)
-                            {
-                                string directoryName = Path.GetDirectoryName(Path.GetDirectoryName(obj.ToString().Replace(" \"%1\"", "").Trim('"')));
-                                NewConfig(directoryName + "\\StarCraft II.exe").Save();
-                            }
+                            string directoryName = Path.GetDirectoryName(Path.GetDirectoryName(obj.ToString().Replace(" \"%1\"", "").Trim('"')));
+                            NewConfig(directoryName + "\\StarCraft II.exe").Save();
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    NewConfig("C:\\Program Files (x86)\\StarCraft II\\StarCraft II.exe").Save();
-                }
-#else
-                var macOsPath = "/Applications/StarCraft II/StarCraft II.app";
-                if (Directory.Exists(macOsPath))
-                {
-                    NewConfig(macOsPath).Save();
-                }
-#endif
             }
-
-            if (!File.Exists(_legacyConfigPath))
+            catch (Exception ex)
             {
-                Log.Logger.Warning("Could not find default StarCraft II!");
-                NewConfig(await fallbackPathFinder()).Save();
+                var config = NewConfig("C:\\Program Files (x86)\\StarCraft II\\StarCraft II.exe");
+                config.Save();
+                return config;
             }
+#else
+            var macOsPath = "/Applications/StarCraft II/StarCraft II.app";
+            if (Directory.Exists(macOsPath))
+            {
+                var config = NewConfig(macOsPath,legacyPath, newPath);
+                config.Save();
+                return config;
+            }
+#endif
 
-            return await MigrateLegacyConfig(fallbackPathFinder, retryCount);
+            Log.Logger.Warning("Could not find default StarCraft II!");
+            var cfg = NewConfig(await fallbackPathFinder(),legacyPath, newPath);
+            cfg.Save();
+            return cfg;
         }
 
-        public static Task<SC2Config> Load(Func<Task<string>> fallbackPathFinder, int retryCount = 0)
+        /// <summary>
+        /// Loads the SC2CCM Config file and returns an object representing that file
+        /// Will create a new config and auto-detect StarCraft II if needed
+        /// </summary>
+        /// <param name="fallbackPathFinder">Fallback method to call in case can't auto-detect StarCraft II config</param>
+        /// <param name="legacyPath">Legacy config file path</param>
+        /// <param name="newPath">New config file path</param>
+        /// <returns></returns>
+        public static Task<SC2Config> Load(Func<Task<string>> fallbackPathFinder, string? legacyPath = null, string? newPath = null)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(_legacyConfigPath)))
+            var legacyConfigPath = legacyPath ?? LegacyConfigPath;
+            var newConfigPath = newPath ?? NewConfigPath;
+            
+            if (!Directory.Exists(Path.GetDirectoryName(legacyConfigPath)))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_legacyConfigPath)!);
+                Directory.CreateDirectory(Path.GetDirectoryName(legacyConfigPath)!);
             }
-            if (!Directory.Exists(Path.GetDirectoryName(_newConfigPath)))
+            if (!Directory.Exists(Path.GetDirectoryName(newConfigPath)))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(_newConfigPath)!);
+                Directory.CreateDirectory(Path.GetDirectoryName(newConfigPath)!);
             }
 
-            if (!File.Exists(_legacyConfigPath))
+            if (!File.Exists(legacyConfigPath))
             {
-                return InitBlankConfig(fallbackPathFinder, retryCount);
+                return InitBlankConfig(fallbackPathFinder, legacyPath: legacyConfigPath, newPath: newConfigPath);
             }
-            else if (!File.Exists(_newConfigPath))
+            else if (!File.Exists(newConfigPath))
             {
-                return MigrateLegacyConfig(fallbackPathFinder, retryCount);
+                return MigrateLegacyConfig(fallbackPathFinder, legacyPath: legacyConfigPath, newPath: newConfigPath);
             }
             else
             {
-                var config = FromFile(_newConfigPath);
+                var config = FromFile(newConfigPath, legacyConfigPath);
                 
                 // If we failed to load our config file, just get a new, blank config
                 if (config != null)
                 {
-                    Log.Logger.Information("Loaded config from {ConfigPath}", _newConfigPath);
+                    Log.Logger.Information("Loaded config from {ConfigPath}", newConfigPath);
                     return Task.FromResult(config);
                 }
 
-                if (retryCount < 3)
-                {
-                    Log.Logger.Error("Unable to load config at {ConfigPath}. Resetting Config and retrying!", _newConfigPath);
-                    return InitBlankConfig(fallbackPathFinder, retryCount + 1);
-                }
-                else
-                {
-                    Log.Logger.Fatal("Retries failed loading config at {ConfigPath}. Terminating!", _newConfigPath);
-                    throw new IOException($"Unable to load config at {_newConfigPath}");
-                }
+                Log.Logger.Error("Unable to load config at {ConfigPath}. Resetting Config and retrying!", newConfigPath);
+                File.Delete(legacyConfigPath);
+                File.Delete(newConfigPath);
+                return InitBlankConfig(fallbackPathFinder, legacyConfigPath, newConfigPath);
             }
         }
 
-        private static SC2Config? FromFile(string newConfigPath)
+        /// <summary>
+        /// Creates an SC2Config from a JSON file
+        /// </summary>
+        /// <param name="newConfigPath">Path to the JSON file</param>
+        /// <param name="legacyConfigPath">Path to the legacy config file (if not provided, will do best guess)</param>
+        /// <returns></returns>
+        private static SC2Config? FromFile(string newConfigPath, string? legacyConfigPath = null)
         {
             try
             {
@@ -176,7 +284,9 @@ namespace SC2_CCM_Common
                     return null;
                 }
 
-                return new SC2Config(data);
+                legacyConfigPath ??= Path.Combine(Path.GetDirectoryName(newConfigPath)!, "SC2CCM.txt");
+
+                return new SC2Config(data, newConfigPath, legacyConfigPath);
             }
             catch (Exception e)
             {
@@ -185,10 +295,18 @@ namespace SC2_CCM_Common
             }
         }
 
-        private static async Task<SC2Config> MigrateLegacyConfig(Func<Task<string>> fallbackPathFinder, int retryCount)
+        /// <summary>
+        /// Migrates the legacy configuration txt-only file to the newer JSON file.
+        /// Legacy file used for compatability with GiantGrantGames CCM (for future Windows port of this app).
+        /// </summary>
+        /// <param name="fallbackPathFinder"></param>
+        /// <param name="legacyPath"></param>
+        /// <param name="newPath"></param>
+        /// <returns></returns>
+        private static async Task<SC2Config> MigrateLegacyConfig(Func<Task<string>> fallbackPathFinder, string legacyPath, string newPath)
         {
             Log.Logger.Warning("Migrating from legacy config");
-            string str = File.ReadLines(_legacyConfigPath).First<string>();
+            string str = File.ReadLines(legacyPath).First();
 #if WINDOWS
             if (!File.Exists(str))
 #else
@@ -196,36 +314,16 @@ namespace SC2_CCM_Common
 #endif
             {
                 Log.Logger.Error("Bad StarCraft II location detected in legacy config! {BadPath}", str);
-                NewConfig(await fallbackPathFinder()).Save();
+                var config = NewConfig(await fallbackPathFinder(), legacyPath, newPath);
+                config.Save();
+                return config;
             }
             else
             {
-                NewConfig(str).Save();
+                var config = NewConfig(str, legacyPath, newPath);
+                config.Save();
+                return config;
             }
-
-            return await Load(fallbackPathFinder, retryCount);
-        }
-
-        public void SetLoadedMod(CampaignType campaignType, string? modName)
-        {
-            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
-                ModSelectionInfo[campaignType].SetItem("mod", modName));
-        }
-
-        public bool ModsEnabled(CampaignType campaignType)
-        {
-            return ModSelectionInfo[campaignType]["enabled"] == "on";
-        }
-
-        public void SetModEnabled(CampaignType campaignType, bool enabled)
-        {
-            ModSelectionInfo = ModSelectionInfo.SetItem(campaignType,
-                ModSelectionInfo[campaignType].SetItem("enabled", enabled ? "on" : "off"));
-        }
-
-        public string? GetLoadedMod(CampaignType campaignType)
-        {
-            return ModSelectionInfo[campaignType]["mod"];
         }
     }
 }
