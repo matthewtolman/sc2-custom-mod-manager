@@ -28,7 +28,6 @@
             Spacing="25"
             Padding="30,0">
             <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
-                <ScrollView Padding="0,20">
                     <VerticalStackLayout
                         x:Name="WoLPane"
                         Spacing="25" 
@@ -36,6 +35,7 @@
                         VerticalOptions="Center">
                 
                         <Label 
+                            x:Name="WoLName"
                             Text="Wings of Liberty"
                             SemanticProperties.HeadingLevel="Level1"
                             FontSize="32"
@@ -85,21 +85,21 @@
                                 SemanticProperties.HeadingLevel="Level2"
                                 FontSize="18" />
             
-                            <Label
-                                x:Name="WoLDescription"
-                                Text="N/A"
-                                SemanticProperties.HeadingLevel="Level2"
-                                SemanticProperties.Description="Campaign Description"
-                                LineBreakMode="WordWrap"
-                                FontSize="18" />
+                            <ScrollView HeightRequest="300">
+                                <Label
+                                    x:Name="WoLDescription"
+                                    Text="N/A"
+                                    SemanticProperties.HeadingLevel="Level2"
+                                    SemanticProperties.Description="Campaign Description"
+                                    LineBreakMode="WordWrap"
+                                    FontSize="18" />
+                            </ScrollView>
 
                         </VerticalStackLayout>
 
                     </VerticalStackLayout>
-                </ScrollView>
             </Border>
             <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
-                <ScrollView>
                     <VerticalStackLayout
                         x:Name="HotsPane"
                         Spacing="25" 
@@ -107,6 +107,7 @@
                         VerticalOptions="Center">
                 
                         <Label 
+                            x:Name="HotSName"
                             Text="Heart of the Swarm"
                             SemanticProperties.HeadingLevel="Level1"
                             FontSize="32"
@@ -123,14 +124,7 @@
                                     x:Name="CustomHotsEnabled"></Switch>
                         </HorizontalStackLayout>
 
-                        <Picker
-                            x:Name="HotsModPicker">
-                            <Picker.ItemsSource>
-                                <x:Array Type="{x:Type x:String}">
-                                    <x:String>None</x:String>
-                                </x:Array>
-                            </Picker.ItemsSource>
-
+                        <Picker x:Name="HotsModPicker">
                         </Picker>
 
                         <HorizontalStackLayout
@@ -157,21 +151,21 @@
                                 SemanticProperties.HeadingLevel="Level2"
                                 FontSize="18" />
             
-                            <Label
-                                x:Name="HotsDescription"
-                                Text="N/A"
-                                SemanticProperties.HeadingLevel="Level2"
-                                SemanticProperties.Description="Campaign Description"
-                                LineBreakMode="WordWrap"
-                                FontSize="18" />
+                            <ScrollView HeightRequest="300">
+                                <Label
+                                    x:Name="HotsDescription"
+                                    Text="N/A"
+                                    SemanticProperties.HeadingLevel="Level2"
+                                    SemanticProperties.Description="Campaign Description"
+                                    LineBreakMode="WordWrap"
+                                    FontSize="18" />
+                            </ScrollView>
 
                         </VerticalStackLayout>
 
                     </VerticalStackLayout>
-                </ScrollView>
             </Border>
             <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
-                <ScrollView>
                     <VerticalStackLayout
                         x:Name="LotvPane"
                         Spacing="25" 
@@ -179,6 +173,7 @@
                         VerticalOptions="Center">
                 
                         <Label 
+                            x:Name="LotVName"
                             Text="Legacy of the Void"
                             SemanticProperties.HeadingLevel="Level1"
                             FontSize="32"
@@ -228,21 +223,21 @@
                                 Text="Description: "
                                 SemanticProperties.HeadingLevel="Level2"
                                 FontSize="18" />
-            
-                            <Label
-                                x:Name="LotvDescription"
-                                Text="N/A"
-                                SemanticProperties.HeadingLevel="Level2"
-                                SemanticProperties.Description="Campaign Description"
-                                LineBreakMode="WordWrap"
-                                FontSize="18" />
+           
+                            <ScrollView HeightRequest="300">
+                                <Label
+                                    x:Name="LotvDescription"
+                                    Text="N/A"
+                                    SemanticProperties.HeadingLevel="Level2"
+                                    SemanticProperties.Description="Campaign Description"
+                                    LineBreakMode="WordWrap"
+                                    FontSize="18" />
+                            </ScrollView>
 
                         </VerticalStackLayout>
                     </VerticalStackLayout>
-                </ScrollView>
             </Border>
             <Border StrokeThickness="5" Margin="10,10" Padding="15,15">
-                <ScrollView>
                     <VerticalStackLayout
                         x:Name="NcoPane"
                         Spacing="25" 
@@ -250,6 +245,7 @@
                         VerticalOptions="Center">
                 
                         <Label 
+                            x:Name="NcoName"
                             Text="Nova Covert Ops"
                             SemanticProperties.HeadingLevel="Level1"
                             FontSize="32"
@@ -300,18 +296,19 @@
                                 SemanticProperties.HeadingLevel="Level2"
                                 FontSize="18" />
             
-                            <Label
-                                x:Name="NcoDescription"
-                                Text="N/A"
-                                SemanticProperties.HeadingLevel="Level2"
-                                SemanticProperties.Description="Campaign Description"
-                                LineBreakMode="WordWrap"
-                                FontSize="18" />
+                            <ScrollView HeightRequest="300">
+                                <Label
+                                    x:Name="NcoDescription"
+                                    Text="N/A"
+                                    SemanticProperties.HeadingLevel="Level2"
+                                    SemanticProperties.Description="Campaign Description"
+                                    LineBreakMode="WordWrap"
+                                    FontSize="18" />
+                            </ScrollView>
 
                         </VerticalStackLayout>
 
                     </VerticalStackLayout>
-                </ScrollView>
             </Border>
         </HorizontalStackLayout>
         <VerticalStackLayout
@@ -324,8 +321,6 @@
                     <VerticalStackLayout
                         x:Name="MessageOutput"
                         MinimumHeightRequest="250">
-                        <Label>StarCraft II Custom Campaign Manager</Label>
-
                     </VerticalStackLayout>
                 </ScrollView>
             </Border>

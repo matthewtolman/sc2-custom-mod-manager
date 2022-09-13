@@ -6,6 +6,13 @@
         <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
         <TrimMode>copyused</TrimMode>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationTitle>SC2 Campaign Manager: Avalon Edition</ApplicationTitle>
+        <ApplicationId>com.mtolman.sc2_custom_campaign_manager_avalon</ApplicationId>
+        <ApplicationIdGuid>BC8FAAEC-5FE5-4E73-8D20-C04199406B0D</ApplicationIdGuid>
+        <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
+        <ApplicationVersion>0</ApplicationVersion>
+        <InformationalVersion>0.2.0</InformationalVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
         <None Remove=".gitignore" />
@@ -26,5 +33,14 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SC2_CCM_Common\SC2_CCM_Common.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Assets\AppIcon\AppIcon" />
+    </ItemGroup>
+    <ItemGroup>
+      <MauiIcon Include="Assets\AppIcon\appicon.svg">
+        <ForegroundFile>Resources/AppIcon/appiconfg.svg</ForegroundFile>
+        <Color>#512BD4</Color>
+      </MauiIcon>
     </ItemGroup>
 </Project>

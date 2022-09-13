@@ -13,7 +13,7 @@ namespace SC2_Avalonia_UI
 {
     public partial class MainWindow : Window
     {
-        private readonly SC2CCM _sc2Ccm;
+        private readonly SC2CCM _sc2ccm;
         private Dictionary<CampaignType, Campaign> Campaigns { get; }
 
         private class CampaignUi
@@ -38,16 +38,16 @@ namespace SC2_Avalonia_UI
 
         public MainWindow()
         {
-            _sc2Ccm = new SC2CCM(ShowMessage, FallbackFindPath);
+            InitializeComponent();
+            _sc2ccm = new SC2CCM(ShowMessage, FallbackFindPath);
             Campaigns = new List<Campaign>()
             {
-                new Campaign(_sc2Ccm, CampaignType.WingsOfLiberty),
-                new Campaign(_sc2Ccm, CampaignType.HeartOfTheSwarm),
-                new Campaign(_sc2Ccm, CampaignType.LegacyOfTheVoid),
-                new Campaign(_sc2Ccm, CampaignType.NovaCovertOps)
+                new Campaign(_sc2ccm, CampaignType.WingsOfLiberty),
+                new Campaign(_sc2ccm, CampaignType.HeartOfTheSwarm),
+                new Campaign(_sc2ccm, CampaignType.LegacyOfTheVoid),
+                new Campaign(_sc2ccm, CampaignType.NovaCovertOps)
             }.ToDictionary(c => c.Type);
 
-            InitializeComponent();
             AppName.Content = Consts.AppName;
             ShowMessage($"Welcome to {Consts.AppName} v{Consts.Version}!");
 
@@ -97,6 +97,16 @@ namespace SC2_Avalonia_UI
                     }
                     ;
                 FullUiSync(campaignType);
+                
+                var campaign = Campaigns[campaignType];
+                if (campaign.ModsEnabled && campaign.ActiveMod != null)
+                {
+                    _sc2ccm.InstallMod(campaign.ActiveMod);
+                }
+                else
+                {
+                    _sc2ccm.Reset(campaignType);
+                }
             }
         }
 
@@ -157,7 +167,7 @@ namespace SC2_Avalonia_UI
             var result = await fileDialog.ShowManagedAsync(this, options);
             if (result != null)
             {
-                _sc2Ccm.Import(result);
+                _sc2ccm.Import(result);
                 Dispatcher.UIThread.Post(UiRefresh);
             }
         }

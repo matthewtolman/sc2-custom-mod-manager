@@ -5,7 +5,7 @@
       "nativeDebugging": false
     },
     "Mac": {
-      "nativeDebugging": true,
+      "nativeDebugging": false,
       "commandName": "Project"
     }
   }
