@@ -123,10 +123,10 @@ public partial class MainPage : ContentPage
         ui.CampaignNameLabel.Text = campaign.Name;
         ui.AuthorLabel.Text = campaign.ActiveModAuthor;
         ui.AuthorLabel.LineBreakMode = LineBreakMode.WordWrap;
-        ui.AuthorLabel.WidthRequest = 120;
+        ui.AuthorLabel.WidthRequest = 180;
         ui.DescriptionLabel.Text = campaign.ActiveModDescription;
         ui.DescriptionLabel.LineBreakMode = LineBreakMode.WordWrap;
-        ui.DescriptionLabel.WidthRequest = 200;
+        ui.DescriptionLabel.WidthRequest = 260;
         ui.ModPicker.IsEnabled = campaign.ModsEnabled;
         ui.VersionLabel.Text = campaign.ActiveModVersion;
         ImportButton.IsEnabled = true;
