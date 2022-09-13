@@ -119,6 +119,15 @@ namespace SC2_CCM_Common
 
         public static Task<SC2Config> Load(Func<Task<string>> fallbackPathFinder)
         {
+            if (!Directory.Exists(Path.GetDirectoryName(_legacyConfigPath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(_legacyConfigPath)!);
+            }
+            if (!Directory.Exists(Path.GetDirectoryName(_newConfigPath)))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(_newConfigPath)!);
+            }
+
             if (!File.Exists(_legacyConfigPath))
             {
                 return InitBlankConfig(fallbackPathFinder);

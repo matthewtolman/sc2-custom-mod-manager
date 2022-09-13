@@ -32,6 +32,7 @@ namespace SC2_CCM_Common
 
         public void EnsureDirectories()
         {
+            EnsureDirectoryExistsWithPerms("Maps");
             EnsureDirectoryExistsWithPerms("Maps", "Campaign");
             EnsureDirectoryExistsWithPerms("Maps", "Campaign", "swarm");
             EnsureDirectoryExistsWithPerms("Maps", "Campaign", "void");

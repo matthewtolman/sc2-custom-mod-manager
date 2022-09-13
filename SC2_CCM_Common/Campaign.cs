@@ -70,7 +70,7 @@ public class Campaign
         get
         {
             var loaded = _sc2ccm.GetLoadedModTitle(Type);
-            return loaded == null ? null : Mods[loaded];
+            return loaded == null || !Mods.ContainsKey(loaded) ? null : Mods[loaded];
         }
     }
 

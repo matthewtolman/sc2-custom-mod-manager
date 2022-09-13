@@ -12,7 +12,4 @@ APP_SIGNING_IDENTITY="3rd Party Mac Developer Application: [***]"
 INSTALLER_SIGNING_IDENTITY="3rd Party Mac Developer Installer: [***]"
 APP_NAME="SC2 CCM Avalon Edition/SC2 CCM Avalon Edition.app"
 
-echo "[INFO] Switch provisionprofile to AppStore"
-cp -R -f 
-
-productbuild --component SC2\ CCM\ Avalon\ Edition/SC2\ CCM\ Avalon\ Edition.app /Applications --sign "$INSTALLER_SIGNING_IDENTITY" SC2\ CCM\ Avalon\ Edition.pkg
+productbuild --component SC2\ CCM\ Avalon\ Edition/SC2\ CCM\ Avalon\ Edition.app /Applicat ions --sign "$INSTALLER_SIGNING_IDENTITY" SC2\ CCM\ Avalon\ Edition.pkg
