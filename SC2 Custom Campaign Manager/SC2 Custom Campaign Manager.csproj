@@ -19,7 +19,7 @@
         <ApplicationIdGuid>E56D783F-80C9-4EEC-A8F1-A717D40396F7</ApplicationIdGuid>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
         <InformationalVersion>0.2.0</InformationalVersion>
 
