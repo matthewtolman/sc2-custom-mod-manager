@@ -14,6 +14,7 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         _watchDog.Alive();
+        Log.Logger.Information("Starting {AppName} v{Version}", Consts.AppName, Consts.Version);
         InitializeComponent();
 
         _sc2ccm = new SC2CCM(ShowMessage, FallbackFindPath);
