@@ -7,11 +7,13 @@ public partial class MainPage : ContentPage
     private readonly SC2CCM _sc2ccm;
     private Dictionary<CampaignType, CampaignUiElements> _campaignUi;
     private readonly string _noneItem = " -- NO CAMPAIGN SELECTED --";
+    private readonly WatchDog _watchDog = new WatchDog();
 
     private Dictionary<CampaignType,Campaign> Campaigns { get; set; }
 
     public MainPage()
     {
+        _watchDog.Alive();
         InitializeComponent();
 
         _sc2ccm = new SC2CCM(ShowMessage, FallbackFindPath);
@@ -64,6 +66,8 @@ public partial class MainPage : ContentPage
                 _sc2ccm.Reset(campaignType);
             }
         }
+        _watchDog.Alive();
+        _watchDog.PeriodicCheckMethod(MainThread.BeginInvokeOnMainThread);
     }
 
     private void QuickUiSync(CampaignType campaignType)
