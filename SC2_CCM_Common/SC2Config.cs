@@ -313,10 +313,10 @@ namespace SC2_CCM_Common
             if (!Directory.Exists(str))
 #endif
             {
-                Log.Logger.Error("Bad StarCraft II location detected in legacy config! {BadPath}", str);
-                var config = NewConfig(await fallbackPathFinder(), legacyPath, newPath);
-                config.Save();
-                return config;
+                // If the config is corrupted, clear it and try again
+                Log.Logger.Error("Bad StarCraft II location detected in legacy config! Resetting config {BadPath}", str);
+                File.Delete(legacyPath);
+                return await InitBlankConfig(fallbackPathFinder, legacyPath, newPath);
             }
             else
             {

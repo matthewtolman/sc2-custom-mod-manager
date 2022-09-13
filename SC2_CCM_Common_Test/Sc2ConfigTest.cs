@@ -102,4 +102,35 @@ public class Sc2ConfigTest
             Directory.Delete(tmpDir, true);
         }
     }
+    
+    [Fact]
+    public async void CorruptedConfigRecovery()
+    {
+        var tmpDir = Path.Combine(Path.GetTempPath(), "SC2CCM");
+        
+        try
+        {
+            var legacyConfig = Path.Combine(tmpDir, "SC2CCM.txt");
+            var newConfig = Path.Combine(tmpDir, "SC2CCM.json");
+            
+            var config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            var detectedExe = config.StarCraft2Exe;
+            
+            File.WriteAllText(newConfig, "INVALID JSON");
+            File.WriteAllText(legacyConfig, "INVALID PATH");
+            
+            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            Assert.Equal(detectedExe, config.StarCraft2Exe);
+            
+            File.Delete(newConfig);
+            File.WriteAllText(legacyConfig, "INVALID PATH");
+            
+            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            Assert.Equal(detectedExe, config.StarCraft2Exe);
+        }
+        finally
+        {
+            Directory.Delete(tmpDir, true);
+        }
+    }
 }
