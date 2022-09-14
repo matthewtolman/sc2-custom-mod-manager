@@ -40,7 +40,7 @@ public class Program
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File(
                 logFile,
-                fileSizeLimitBytes: 2 * 1024 * 1024, // 2MB
+                fileSizeLimitBytes: 2 * 1024 * 1024, // 2MBÏ
                 restrictedToMinimumLevel: LogEventLevel.Debug
             )
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Verbose)

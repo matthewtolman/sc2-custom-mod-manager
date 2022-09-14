@@ -1,4 +1,5 @@
-﻿using SC2_CCM_Common;
+﻿using Microsoft.Maui.Devices.Sensors;
+using SC2_CCM_Common;
 
 namespace SC2_Custom_Campaign_Manager;
 
@@ -38,7 +39,10 @@ public partial class MainPage : ContentPage
         // Get our UI components ready
         InitializeComponent();
 
-        _sc2ccm = new SC2CCM(ShowMessage, UserPromptSc2Path);
+        // Show our welcome message
+        ShowMessage($"Welcome to {Consts.AppName} v{Consts.Version}!");
+
+        _sc2ccm = new SC2CCM(ShowMessage);
         
         // Create our campaign list
         Campaigns = new List<Campaign>()
@@ -57,9 +61,6 @@ public partial class MainPage : ContentPage
             { CampaignType.LegacyOfTheVoid, new CampaignUiElements(CustomLotvEnabled, LotvModPicker, LotVName, LotvAuthor, LotvDescription, LotvVersion) },
             { CampaignType.NovaCovertOps, new CampaignUiElements(CustomNcoEnabled, NcoModPicker, NcoName, NcoAuthor, NcoDescription, NcoVersion) }
         };
-        
-        // Show our welcome message
-        ShowMessage($"Welcome to {Consts.AppName} v{Consts.Version}!");
 
         // Setup our per-campaign data
         foreach (var campaignType in Campaigns.Keys)
@@ -103,6 +104,11 @@ public partial class MainPage : ContentPage
                 _sc2ccm.Reset(campaignType);
             }
         }
+
+        if (!_sc2ccm.GoodState())
+        {
+            SetStarCraft2Location.IsVisible = true;
+        }
         
         // We're still alive!
         _watchDog.Pulse();
@@ -127,9 +133,10 @@ public partial class MainPage : ContentPage
         ui.DescriptionLabel.Text = campaign.ActiveModDescription;
         ui.DescriptionLabel.LineBreakMode = LineBreakMode.WordWrap;
         ui.DescriptionLabel.WidthRequest = 260;
-        ui.ModPicker.IsEnabled = campaign.ModsEnabled;
+        ui.ModsEnabledSwitch.IsEnabled = _sc2ccm.GoodState();
+        ui.ModPicker.IsEnabled = campaign.ModsEnabled && _sc2ccm.GoodState();
         ui.VersionLabel.Text = campaign.ActiveModVersion;
-        ImportButton.IsEnabled = true;
+        ImportButton.IsEnabled = _sc2ccm.GoodState();
     }
 
     /// <summary>
@@ -169,6 +176,7 @@ public partial class MainPage : ContentPage
     /// </summary>
     private void UiRefresh()
     {
+        SetStarCraft2Location.IsVisible = !_sc2ccm.GoodState();
         foreach (var campaignType in Campaigns.Keys)
         {
             FullUiSync(campaignType);
@@ -244,20 +252,23 @@ public partial class MainPage : ContentPage
     /// </summary>
     /// <returns></returns>
     /// <exception cref="IOException"></exception>
-    private async Task<string> UserPromptSc2Path()
+    private async Task UserPromptSc2Path()
     {
-        bool answer = await DisplayAlert("SC2 Custom Mod Manger", "Unable to find default StarCraft II executable. Would you like to pick the executable? (Note: on Mac pick the StarCraft II.app folder)", "Yes", "No");
-        if (answer)
+        SetStarCraft2Location.IsEnabled = false;
+        var picker = await FilePicker.Default.PickAsync(PickOptions.Default);
+        if (picker != null)
         {
-            var picker = await FilePicker.Default.PickAsync(PickOptions.Default);
-            if (picker != null)
+            var location = picker.FullPath;
+
+            if (location != null && location != "")
             {
-                return picker.FullPath;
+                _sc2ccm.SubmitStarCraft2Location(location);
+                MainThread.BeginInvokeOnMainThread(UiRefresh);
+                return;
             }
         }
-        await DisplayAlert("SC2 Custom Mod Manager", "Unable to proceed without valid StarCraft II executable. Exiting", "Ok");
-        Application.Current?.CloseWindow(Application.Current.MainPage?.Window!);
-        throw new IOException("Could not find StarCraft II file");
+        SetStarCraft2Location.IsEnabled = true;
+        await DisplayAlert("SC2 Custom Mod Manager", "Unable to proceed without valid StarCraft II executable.", "Ok");
     }
 
     /// <summary>
@@ -280,5 +291,10 @@ public partial class MainPage : ContentPage
         
         Campaigns[option.CampaignType].SelectOption(option);
         QuickUiSync(option.CampaignType);
+    }
+
+    async private void SetStarCraft2Location_OnClicked(object? sender, EventArgs e)
+    {
+        await UserPromptSc2Path();
     }
 }

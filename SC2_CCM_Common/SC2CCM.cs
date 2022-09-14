@@ -28,13 +28,45 @@ namespace SC2_CCM_Common
         /// <param name="fallbackPathFinder">
         /// Method to retrieve StarCraft II executable if auto-detect fails
         /// </param>
-        public SC2CCM(Action<string> messageProcessor, Func<Task<string>> fallbackPathFinder)
+        public SC2CCM(Action<string> messageProcessor)
         {
-            var configTask = SC2Config.Load(fallbackPathFinder);
-            configTask.Wait();
-            _config = configTask.Result;
+            _config = SC2Config.Load();
             _modFileSystem = new ModFileSystem(_config, messageProcessor);
-            Load();
+
+            if (GoodState())
+            {
+                Load();
+            }
+            else
+            {
+                messageProcessor("ERROR! Unable to find StarCraft II! Please click \"Set StarCraft II Location\" and select your StarCraft II installation!");
+            }
+        }
+
+        /// <summary>
+        /// Returns whether SC2CCM is in a good state (aka knows where starcraft 2 is)
+        /// </summary>
+        /// <returns></returns>
+        public bool GoodState()
+        {
+            return _config.StarCraft2Exe != "";
+        }
+
+        public void SubmitStarCraft2Location(string location)
+        {
+#if WINDOWS
+            if (!File.Exists(str))
+#else
+            if (!Directory.Exists(location))
+#endif
+            {
+                Log.Logger.Debug("Invalid location {Location} provided", location);
+            }
+            else
+            {
+                _config.StarCraft2Exe = location;
+                Load();
+            }
         }
 
         /// <summary>
@@ -45,6 +77,12 @@ namespace SC2_CCM_Common
         /// </param>
         public void Import(params string[] filePaths)
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping import");
+                return;
+            }
+
             foreach (var path in filePaths)
             {
                 _modFileSystem.Import(path);
@@ -58,6 +96,12 @@ namespace SC2_CCM_Common
         /// </summary>
         private void Load()
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping load");
+                return;
+            }
+
             Log.Logger.Debug("Running SC2CCM Load");
             _modFileSystem.EnsureDirectories();
             _modFileSystem.UnzipCustomCampaigns();
@@ -91,6 +135,12 @@ namespace SC2_CCM_Common
         /// <param name="mod">Mod to install</param>
         public void InstallMod(Mod mod)
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping mod install");
+                return;
+            }
+            
             _modFileSystem.Install(mod);
             _config.SetLoadedMod(mod.CampaignType, mod.Title);
         }
@@ -101,6 +151,12 @@ namespace SC2_CCM_Common
         /// <param name="campaignType">Campaign type to reset</param>
         public void Reset(CampaignType campaignType)
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping campaign reset");
+                return;
+            }
+
             _modFileSystem.Reset(campaignType);
             _config.SetLoadedMod(campaignType, null);
         }
@@ -132,6 +188,12 @@ namespace SC2_CCM_Common
         /// <param name="type"></param>
         public void DisableMods(CampaignType type)
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping campaign mod disable");
+                return;
+            }
+
             _modFileSystem.Reset(type);
             _config.SetModEnabled(type, false);
         }
@@ -143,6 +205,12 @@ namespace SC2_CCM_Common
         /// <param name="type"></param>
         public void EnableMods(CampaignType type)
         {
+            if (!GoodState())
+            {
+                Log.Logger.Debug("Not in a good state yet, skipping campaign mod enable");
+                return;
+            }
+
             var modToInstall = _config.GetLoadedMod(type);
             if (modToInstall != null)
             {

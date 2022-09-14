@@ -46,7 +46,15 @@ namespace SC2_CCM_Common
         /// <summary>
         /// StarCraft II Executable
         /// </summary>
-        public string StarCraft2Exe => _data.StarCraft2Exe;
+        public string StarCraft2Exe
+        {
+            get => _data.StarCraft2Exe;
+            set
+            {
+                _data.StarCraft2Exe = value;
+                Save();
+            }
+        }
 
         /// <summary>
         /// Convenience wrapper around mod selection info which also does automatic saves on change
@@ -168,7 +176,7 @@ namespace SC2_CCM_Common
         /// <param name="newPath">New configuration file path</param>
         /// <returns>Configuration object</returns>
         /// <exception cref="ModManagerException"></exception>
-        private static async Task<SC2Config> InitBlankConfig(Func<Task<string>> fallbackPathFinder, string legacyPath, string newPath)
+        private static SC2Config InitBlankConfig(string legacyPath, string newPath)
         {
             Log.Logger.Warning("Initializing from blank config");
             try
@@ -210,10 +218,22 @@ namespace SC2_CCM_Common
                 config.Save();
                 return config;
             }
+            else if (Directory.Exists("/Applications/StarCraft 2/StarCraft II.app"))
+            {
+                var config = NewConfig("/Applications/StarCraft 2/StarCraft II.app",legacyPath, newPath);
+                config.Save();
+                return config;
+            }
+            else if (Directory.Exists("/Applications/StarCraft 2/StarCraft 2.app"))
+            {
+                var config = NewConfig("/Applications/StarCraft 2/StarCraft 2.app",legacyPath, newPath);
+                config.Save();
+                return config;
+            }
 #endif
 
             Log.Logger.Warning("Could not find default StarCraft II!");
-            var cfg = NewConfig(await fallbackPathFinder(),legacyPath, newPath);
+            var cfg = NewConfig("", legacyPath, newPath);
             cfg.Save();
             return cfg;
         }
@@ -226,7 +246,7 @@ namespace SC2_CCM_Common
         /// <param name="legacyPath">Legacy config file path</param>
         /// <param name="newPath">New config file path</param>
         /// <returns></returns>
-        public static Task<SC2Config> Load(Func<Task<string>> fallbackPathFinder, string? legacyPath = null, string? newPath = null)
+        public static SC2Config Load(string? legacyPath = null, string? newPath = null)
         {
             var legacyConfigPath = legacyPath ?? LegacyConfigPath;
             var newConfigPath = newPath ?? NewConfigPath;
@@ -242,11 +262,11 @@ namespace SC2_CCM_Common
 
             if (!File.Exists(legacyConfigPath))
             {
-                return InitBlankConfig(fallbackPathFinder, legacyPath: legacyConfigPath, newPath: newConfigPath);
+                return InitBlankConfig(legacyPath: legacyConfigPath, newPath: newConfigPath);
             }
             else if (!File.Exists(newConfigPath))
             {
-                return MigrateLegacyConfig(fallbackPathFinder, legacyPath: legacyConfigPath, newPath: newConfigPath);
+                return MigrateLegacyConfig(legacyPath: legacyConfigPath, newPath: newConfigPath);
             }
             else
             {
@@ -256,13 +276,13 @@ namespace SC2_CCM_Common
                 if (config != null)
                 {
                     Log.Logger.Information("Loaded config from {ConfigPath}", newConfigPath);
-                    return Task.FromResult(config);
+                    return config;
                 }
 
                 Log.Logger.Error("Unable to load config at {ConfigPath}. Resetting Config and retrying!", newConfigPath);
                 File.Delete(legacyConfigPath);
                 File.Delete(newConfigPath);
-                return InitBlankConfig(fallbackPathFinder, legacyConfigPath, newConfigPath);
+                return InitBlankConfig(legacyConfigPath, newConfigPath);
             }
         }
 
@@ -303,7 +323,7 @@ namespace SC2_CCM_Common
         /// <param name="legacyPath"></param>
         /// <param name="newPath"></param>
         /// <returns></returns>
-        private static async Task<SC2Config> MigrateLegacyConfig(Func<Task<string>> fallbackPathFinder, string legacyPath, string newPath)
+        private static SC2Config MigrateLegacyConfig(string legacyPath, string newPath)
         {
             Log.Logger.Warning("Migrating from legacy config");
             string str = File.ReadLines(legacyPath).First();
@@ -316,7 +336,7 @@ namespace SC2_CCM_Common
                 // If the config is corrupted, clear it and try again
                 Log.Logger.Error("Bad StarCraft II location detected in legacy config! Resetting config {BadPath}", str);
                 File.Delete(legacyPath);
-                return await InitBlankConfig(fallbackPathFinder, legacyPath, newPath);
+                return InitBlankConfig(legacyPath, newPath);
             }
             else
             {
