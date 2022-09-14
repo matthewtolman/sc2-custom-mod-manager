@@ -77,6 +77,7 @@ namespace SC2_CCM_Common
             EnsureDirectoryExistsWithPerms("Maps", "Campaign", "nova");
             EnsureDirectoryExistsWithPerms("Maps", "CustomCampaigns");
             EnsureDirectoryExistsWithPerms("Maps", "Mods");
+            EnsureDirectoryExistsWithPerms("Mods");
         }
 
         /// <summary>
