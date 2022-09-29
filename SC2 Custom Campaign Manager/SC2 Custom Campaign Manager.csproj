@@ -34,12 +34,15 @@
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
         <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <PackageCertificateThumbprint>C211EA69E2273BA2ABA100F97B5888D4CA158DC3</PackageCertificateThumbprint>
-        <AppxPackageSigningTimestampDigestAlgorithm>SHA512</AppxPackageSigningTimestampDigestAlgorithm>
-        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-        <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+      <PackageCertificateThumbprint>C211EA69E2273BA2ABA100F97B5888D4CA158DC3</PackageCertificateThumbprint>
+      <AppxPackageSigningTimestampDigestAlgorithm>SHA512</AppxPackageSigningTimestampDigestAlgorithm>
+      <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+      <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
         <GenerateTestArtifacts>True</GenerateTestArtifacts>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
+        <DefaultLanguage>en</DefaultLanguage>
+        <PlatformTarget>AnyCPU</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,6 +58,84 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="app-icon-wd.scale-100.png" />
+      <None Remove="app-icon-wd.scale-125.png" />
+      <None Remove="app-icon-wd.scale-150.png" />
+      <None Remove="app-icon-wd.scale-200.png" />
+      <None Remove="app-icon-wd.scale-400.png" />
+      <None Remove="appicon-lg.scale-100.png" />
+      <None Remove="appicon-lg.scale-125.png" />
+      <None Remove="appicon-lg.scale-150.png" />
+      <None Remove="appicon-lg.scale-200.png" />
+      <None Remove="appicon-lg.scale-400.png" />
+      <None Remove="appicon-md.scale-100.png" />
+      <None Remove="appicon-md.scale-125.png" />
+      <None Remove="appicon-md.scale-150.png" />
+      <None Remove="appicon-md.scale-200.png" />
+      <None Remove="appicon-md.scale-400.png" />
+      <None Remove="appicon-sm.scale-100.png" />
+      <None Remove="appicon-sm.scale-125.png" />
+      <None Remove="appicon-sm.scale-150.png" />
+      <None Remove="appicon-sm.scale-200.png" />
+      <None Remove="appicon-sm.scale-400.png" />
+      <None Remove="appicon.scale-100.png" />
+      <None Remove="appicon.scale-125.png" />
+      <None Remove="appicon.scale-150.png" />
+      <None Remove="appicon.scale-200.png" />
+      <None Remove="appicon.scale-400.png" />
+      <None Remove="appicon.targetsize-16.png" />
+      <None Remove="appicon.targetsize-16_altform-unplated.png" />
+      <None Remove="appicon.targetsize-24.png" />
+      <None Remove="appicon.targetsize-24_altform-unplated.png" />
+      <None Remove="appicon.targetsize-256.png" />
+      <None Remove="appicon.targetsize-256_altform-unplated.png" />
+      <None Remove="appicon.targetsize-32.png" />
+      <None Remove="appicon.targetsize-32_altform-unplated.png" />
+      <None Remove="appicon.targetsize-48.png" />
+      <None Remove="appicon.targetsize-48_altform-unplated.png" />
+      <None Remove="package-logo.scale-400.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="app-icon-wd.scale-100.png" />
+      <Content Include="app-icon-wd.scale-125.png" />
+      <Content Include="app-icon-wd.scale-150.png" />
+      <Content Include="app-icon-wd.scale-200.png" />
+      <Content Include="app-icon-wd.scale-400.png" />
+      <Content Include="appicon-lg.scale-100.png" />
+      <Content Include="appicon-lg.scale-125.png" />
+      <Content Include="appicon-lg.scale-150.png" />
+      <Content Include="appicon-lg.scale-200.png" />
+      <Content Include="appicon-lg.scale-400.png" />
+      <Content Include="appicon-md.scale-100.png" />
+      <Content Include="appicon-md.scale-125.png" />
+      <Content Include="appicon-md.scale-150.png" />
+      <Content Include="appicon-md.scale-200.png" />
+      <Content Include="appicon-md.scale-400.png" />
+      <Content Include="appicon-sm.scale-100.png" />
+      <Content Include="appicon-sm.scale-125.png" />
+      <Content Include="appicon-sm.scale-150.png" />
+      <Content Include="appicon-sm.scale-200.png" />
+      <Content Include="appicon-sm.scale-400.png" />
+      <Content Include="appicon.scale-100.png" />
+      <Content Include="appicon.scale-125.png" />
+      <Content Include="appicon.scale-150.png" />
+      <Content Include="appicon.scale-200.png" />
+      <Content Include="appicon.scale-400.png" />
+      <Content Include="appicon.targetsize-16.png" />
+      <Content Include="appicon.targetsize-16_altform-unplated.png" />
+      <Content Include="appicon.targetsize-24.png" />
+      <Content Include="appicon.targetsize-24_altform-unplated.png" />
+      <Content Include="appicon.targetsize-256.png" />
+      <Content Include="appicon.targetsize-256_altform-unplated.png" />
+      <Content Include="appicon.targetsize-32.png" />
+      <Content Include="appicon.targetsize-32_altform-unplated.png" />
+      <Content Include="appicon.targetsize-48.png" />
+      <Content Include="appicon.targetsize-48_altform-unplated.png" />
+      <Content Include="package-logo.scale-400.png" />
     </ItemGroup>
 
     <ItemGroup>

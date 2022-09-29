@@ -3,14 +3,15 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap rescap">
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  IgnorableNamespaces="uap rescap mp">
 
   <Identity Name="maui-package-name-placeholder" Publisher="CN=TofuR" Version="0.2.1.0" />
 
   <Properties>
-    <DisplayName>$placeholder$</DisplayName>
-    <PublisherDisplayName>User Name</PublisherDisplayName>
-    <Logo>$placeholder$.png</Logo>
+    <DisplayName>SC2 Custom Campaign Manager MAUI Edition</DisplayName>
+    <PublisherDisplayName>TofuRama</PublisherDisplayName>
+    <Logo>package-logo.png</Logo>
   </Properties>
 
   <Dependencies>
@@ -25,13 +26,17 @@
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="$placeholder$"
-        Description="$placeholder$"
-        Square150x150Logo="$placeholder$.png"
-        Square44x44Logo="$placeholder$.png"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Square71x71Logo="$placeholder$.png" Wide310x150Logo="$placeholder$.png" Square310x310Logo="$placeholder$.png" />
-        <uap:SplashScreen Image="$placeholder$.png" />
+        DisplayName="SC2 Custom Campaign Manager MAUI Edition"
+        Description="Custom Campaign manager for StarCraft II using custom campaigns developed by the GiantGrantGames YouTube community."
+        Square150x150Logo="appicon-md.png"
+        BackgroundColor="#1010CC" Square44x44Logo="appicon.png">
+        <uap:DefaultTile Square71x71Logo="appicon-sm.png" Wide310x150Logo="app-icon-wd.png" Square310x310Logo="appicon-lg.png" >
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+            <uap:ShowOn Tile="square310x310Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
       </uap:VisualElements>
     </Application>
   </Applications>
