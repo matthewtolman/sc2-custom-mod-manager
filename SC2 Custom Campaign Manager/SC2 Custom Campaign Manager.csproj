@@ -17,6 +17,7 @@
         <!-- App Identifier -->
         <ApplicationId>com.mtolman.sc2_custom_campaign_manager</ApplicationId>
         <ApplicationIdGuid>E56D783F-80C9-4EEC-A8F1-A717D40396F7</ApplicationIdGuid>
+        <PackageId>SC2CCM.Maui</PackageId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>0.2.3</ApplicationDisplayVersion>
@@ -31,6 +32,14 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
         <Nullable>enable</Nullable>
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <PackageCertificateThumbprint>C211EA69E2273BA2ABA100F97B5888D4CA158DC3</PackageCertificateThumbprint>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA512</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     </PropertyGroup>
 
     <ItemGroup>
