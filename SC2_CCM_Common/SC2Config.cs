@@ -1,6 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json;
 
+#if WINDOWS
+using Microsoft.Win32;
+#endif
+
 namespace SC2_CCM_Common
 {
     /// <summary>
@@ -191,22 +195,22 @@ namespace SC2_CCM_Common
 #if WINDOWS
             try
             {
-                using (RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software\\Classes\\Blizzard.SC2Save\\shell\\open\\command"))
+                using RegistryKey? registryKey = Registry.LocalMachine.OpenSubKey("Software\\Classes\\Blizzard.SC2Save\\shell\\open\\command");
+                if (registryKey != null)
                 {
-                    if (registryKey != null)
+                    var obj = registryKey.GetValue(null);
+                    if (obj != null)
                     {
-                        object obj = registryKey.GetValue((string) null);
-                        if (obj != null)
-                        {
-                            string directoryName = Path.GetDirectoryName(Path.GetDirectoryName(obj.ToString().Replace(" \"%1\"", "").Trim('"')));
-                            NewConfig(directoryName + "\\StarCraft II.exe").Save();
-                        }
+                        string directoryName = Path.GetDirectoryName(Path.GetDirectoryName(obj.ToString().Replace(" \"%1\"", "").Trim('"')))!;
+                        var config = NewConfig(directoryName + "\\StarCraft II.exe", legacyPath, newPath);
+                        config.Save();
+                        return config;
                     }
                 }
             }
             catch (Exception ex)
             {
-                var config = NewConfig("C:\\Program Files (x86)\\StarCraft II\\StarCraft II.exe");
+                var config = NewConfig("C:\\Program Files (x86)\\StarCraft II\\StarCraft II.exe", legacyPath, newPath);
                 config.Save();
                 return config;
             }

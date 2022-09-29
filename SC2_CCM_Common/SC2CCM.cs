@@ -55,7 +55,7 @@ namespace SC2_CCM_Common
         public void SubmitStarCraft2Location(string location)
         {
 #if WINDOWS
-            if (!File.Exists(str))
+            if (!File.Exists(location))
 #else
             if (!Directory.Exists(location))
 #endif

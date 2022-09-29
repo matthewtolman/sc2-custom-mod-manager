@@ -5,7 +5,7 @@ namespace SC2_CCM_Common_Test;
 public class Sc2ConfigTest
 {
     [Fact]
-    public async void ConfigLoadTest()
+    public void ConfigLoadTest()
     {
         var tmpDir = Path.Combine(Path.GetTempPath(), "SC2CCM");
         
@@ -13,9 +13,20 @@ public class Sc2ConfigTest
         {
             var legacyConfig = Path.Combine(tmpDir, "SC2CCM.txt");
             var newConfig = Path.Combine(tmpDir, "SC2CCM.json");
+
+            // Clean up
+            if (File.Exists(legacyConfig))
+            {
+                File.Delete(legacyConfig);
+            }
+
+            if (File.Exists(newConfig))
+            {
+                File.Delete(newConfig);
+            }
             
             // Blank Config
-            var config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            var config = SC2Config.Load(legacyConfig, newConfig);
 
             Assert.NotNull(config);
 
@@ -34,7 +45,7 @@ public class Sc2ConfigTest
             File.Delete(newConfig);
 
             // Migrate Config
-            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            config = SC2Config.Load(legacyConfig, newConfig);
             Assert.Equal(oldExe, config.StarCraft2Exe);
 
             Assert.False(config.ModsEnabled(CampaignType.WingsOfLiberty));
@@ -54,7 +65,7 @@ public class Sc2ConfigTest
             config.SetLoadedMod(CampaignType.HeartOfTheSwarm, "Real Scale");
             
             // New Config
-            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            config = SC2Config.Load(legacyConfig, newConfig);
             Assert.Equal(oldExe, config.StarCraft2Exe);
             
             Assert.False(config.ModsEnabled(CampaignType.WingsOfLiberty));
@@ -84,7 +95,7 @@ public class Sc2ConfigTest
             var legacyConfig = Path.Combine(tmpDir, "SC2CCM.txt");
             var newConfig = Path.Combine(tmpDir, "SC2CCM.json");
             
-            var config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            var config = SC2Config.Load(legacyConfig, newConfig);
             Assert.False(config.ModsEnabled(CampaignType.WingsOfLiberty));
             config.SetModEnabled(CampaignType.WingsOfLiberty, true);
             Assert.True(config.ModsEnabled(CampaignType.WingsOfLiberty));
@@ -113,19 +124,19 @@ public class Sc2ConfigTest
             var legacyConfig = Path.Combine(tmpDir, "SC2CCM.txt");
             var newConfig = Path.Combine(tmpDir, "SC2CCM.json");
             
-            var config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            var config = SC2Config.Load(legacyConfig, newConfig);
             var detectedExe = config.StarCraft2Exe;
             
             File.WriteAllText(newConfig, "INVALID JSON");
             File.WriteAllText(legacyConfig, "INVALID PATH");
             
-            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            config = SC2Config.Load(legacyConfig, newConfig);
             Assert.Equal(detectedExe, config.StarCraft2Exe);
             
             File.Delete(newConfig);
             File.WriteAllText(legacyConfig, "INVALID PATH");
             
-            config = await SC2Config.Load(async () => "test", legacyConfig, newConfig);
+            config = SC2Config.Load(legacyConfig, newConfig);
             Assert.Equal(detectedExe, config.StarCraft2Exe);
         }
         finally

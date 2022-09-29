@@ -18,11 +18,6 @@ public partial class MainPage : ContentPage
     /// UI elements tied to a campaign
     /// </summary>
     private readonly Dictionary<CampaignType, CampaignUiElements> _campaignUi;
-    
-    /// <summary>
-    /// Program watch dog
-    /// </summary>
-    private readonly WatchDog _watchDog = new();
 
     /// <summary>
     /// Mapping of campaign type to custom compaign data
@@ -31,9 +26,6 @@ public partial class MainPage : ContentPage
 
     public MainPage()
     {
-        // Tell the watch dog we're alive
-        // It's already going since we're trying to detect app freezes during start-up
-        _watchDog.Pulse();
         Log.Logger.Information("Starting {AppName} v{Version}", Consts.AppName, Consts.Version);
         
         // Get our UI components ready
@@ -64,10 +56,7 @@ public partial class MainPage : ContentPage
 
         // Setup our per-campaign data
         foreach (var campaignType in Campaigns.Keys)
-        {
-            // We're still alive!
-            _watchDog.Pulse();
-            
+        {   
             // Setup our switch error handlers
             _campaignUi[campaignType].ModsEnabledSwitch.Toggled += (object? sender, ToggledEventArgs e) =>
             {
@@ -109,13 +98,6 @@ public partial class MainPage : ContentPage
         {
             SetStarCraft2Location.IsVisible = true;
         }
-        
-        // We're still alive!
-        _watchDog.Pulse();
-        
-        // Setup a pulse to come from the main thread;
-        // if we block the main thread (aka: become unresponsive) then the watch dog will trigger
-        _watchDog.PeriodicCheckMethod(MainThread.BeginInvokeOnMainThread);
     }
 
     /// <summary>
