@@ -40,34 +40,11 @@ To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-
 ### Windows
 To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:Release`
 
-## Avalonia UI
+## UI Modularity
 
-### Build Requirements
+All of the core logic, logging, etc is in the Commons repository. This means that the UI can easily be changed out as needed per platform. Originally, there were two UIs, but I decided to just move to one UI for now. However, in the future if someone wanted to create another UI on-top, it would be very simple.
 
-The simplest setup is to install Visual Studio and add C# (make sure you're version of visual studio supports .NET 6).
-However, if you don't want to install Visual Studio, then you can install just the .NET CLI and go from there.
-
-This project requires .NET 6 to be installed.
-To get everything setup, do the following:
-
-* Go to https://dotnet.microsoft.com/en-us/download and install .NET 6
-* Once that finishes, run `dotnet run --project SC2_Avalonia_UI -c:Release` to launch the program
-
-## Building
-
-### Mac
-To build, run `dotnet run --project SC2_Avalonia_UI -r:osx-x64 -c:Release`
-
-To create a pkg file, run `dotnet build SC2_Avalonia_UI -r:osx-x64 -c:Release`
-
-#### Local publishing
-
-* Run `rm -rf out/avalon && dotnet restore -r osx-x64 && dotnet publish SC2_Avalonia_UI -c:Release -o out/avalon --sc --nologo -r:osx-x64 -p:PublishSingleFile=true`
-
-#### Packaging
-
-### Windows
-To build, run `dotnet build SC2_Avalonia_UI -f:net6.0-windows -c:Release`
+The other advantage of this modularity is the UI code is both small and easy to read, so learning how to adapt new UIs should be fairly straightforward.
 
 ## Features
 
