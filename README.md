@@ -69,7 +69,7 @@ I use Visual Studio's publishing feature for this project. Publishing is current
     * Produce single file: Checked
     * Enable ReadyToRun compilation: Checked
 
-## UI Modularity
+## Code Modularity
 
 All of the core logic, logging, etc is in the Commons library. This means that the UI can easily be changed out as needed per platform. Originally, there were two UIs, but I decided to just move to one UI for now. However, in the future if someone wanted to create another UI on-top, it would be very simple.
 
