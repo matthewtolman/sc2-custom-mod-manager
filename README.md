@@ -6,10 +6,11 @@ They have developed and freely released their mod manager, however their mod man
 
 This mod manager aims to work on both Mac and Windows as both platforms are officially supported by Blizzard for StarCraft II.
 
-Currently only Mac on Intel processors has been tested and verified.
+Currently only Mac on Intel processors and Windows 10 and 11 have been tested and verified.
 
 ## MAUI UI
 
+Tested on Mac and Windows. Published for Mac, haven't figured out publishing for Windows. WinForm is used for the published Windows version.
 
 ### Build Requirements
 
@@ -40,11 +41,49 @@ To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-
 ### Windows
 To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:Release`
 
+## WinForm
+
+The WinForm UI has only been tested with Windows. The easiest way to build it is to load the solution in Visual Studio and then run the WinForm project.
+This is what's published for Windows
+
+### Publishing
+
+I use Visual Studio's publishing feature for this project. Publishing is currently for the "folder publish" type and "folder publish" location. My settings are as follows:
+
+* 64-bit Settings
+  * Configuration: Release | Any CPU
+  * Target framework: net6.0-windows
+  * Deployment mode: Self-contained
+  * Target runtime: win-x64
+  * Target loxation: bin\Release\net6.0-windows\publish\win-x64\
+  * File publish options
+    * Produce single file: Checked
+    * Enable ReadyToRun compilation: Checked
+* 32-bit Settings
+  * Configuration: Release | Any CPU
+  * Target framework: net6.0-windows
+  * Deployment mode: Self-contained
+  * Target runtime: win-x86
+  * Target loxation: bin\Release\net6.0-windows\publish\win-x86\
+  * File publish options
+    * Produce single file: Checked
+    * Enable ReadyToRun compilation: Checked
+
 ## UI Modularity
 
 All of the core logic, logging, etc is in the Commons library. This means that the UI can easily be changed out as needed per platform. Originally, there were two UIs, but I decided to just move to one UI for now. However, in the future if someone wanted to create another UI on-top, it would be very simple.
 
 The other advantage of this modularity is the UI code is both small and easy to read, so learning how to adapt new UIs should be fairly straightforward.
+
+UI code is responsible for the following:
+* Overriding where logging goes and doing any log rotation (if needed)
+    * This allows for UIs to choose an "internet connected" log reporting, local logging, no logging, etc
+* Defining a "ShowMessage" method which takes a string and (hopefully) shows the user a message in some sort of UI logging
+* Initializing an instance of SC2CCM
+* Presenting the current UI state to the user (state is read from SC2CCM)
+* Setting up UI handlers to forward events to SC2CCM
+
+That's pretty much it. All of the unzipping, detecting installed campaigns, loading configuration, log messages, etc. is handled by the commons module. Manually written UI code should be around 300 lines of code, including class/method boilerplate and comments
 
 ## Features
 
