@@ -42,7 +42,7 @@ To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:R
 
 ## UI Modularity
 
-All of the core logic, logging, etc is in the Commons repository. This means that the UI can easily be changed out as needed per platform. Originally, there were two UIs, but I decided to just move to one UI for now. However, in the future if someone wanted to create another UI on-top, it would be very simple.
+All of the core logic, logging, etc is in the Commons library. This means that the UI can easily be changed out as needed per platform. Originally, there were two UIs, but I decided to just move to one UI for now. However, in the future if someone wanted to create another UI on-top, it would be very simple.
 
 The other advantage of this modularity is the UI code is both small and easy to read, so learning how to adapt new UIs should be fairly straightforward.
 
