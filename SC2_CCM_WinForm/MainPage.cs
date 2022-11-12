@@ -147,6 +147,7 @@ namespace SC2_CCM_WinForm
             ui.ModPicker.SelectedIndexChanged += ModPickerOnSelectedIndexChanged;
 
             // Sync our output UI
+            QuickUiSync(campaignType);
         }
 
         /// <summary>
