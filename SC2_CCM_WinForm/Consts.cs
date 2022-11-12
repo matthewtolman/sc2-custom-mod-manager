@@ -1,0 +1,19 @@
+using System.Reflection;
+
+namespace SC2_CCM_WinForm;
+
+/// <summary>
+/// Program-wide constants
+/// </summary>
+public static class Consts
+{
+    /// <summary>
+    /// Name of the application
+    /// </summary>
+    public const string AppName = "SC2 Custom Campaign Manager: XP Edition";
+    
+    /// <summary>
+    /// Version of the appication
+    /// </summary>
+    public static string Version => Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.1";
+}

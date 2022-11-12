@@ -192,7 +192,7 @@ namespace SC2_CCM_Common
                 Log.Logger.Error(e, "Could not create configuration file!");
                 throw new ModManagerException("Unable to create configuration file/folder\nTry running this as administrator.");
             }
-#if WINDOWS
+#if WINDOWS2
             try
             {
                 using RegistryKey? registryKey = Registry.LocalMachine.OpenSubKey("Software\\Classes\\Blizzard.SC2Save\\shell\\open\\command");

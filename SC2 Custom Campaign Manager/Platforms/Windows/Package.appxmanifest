@@ -6,7 +6,7 @@
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   IgnorableNamespaces="uap rescap mp">
 
-  <Identity Name="maui-package-name-placeholder" Publisher="CN=TofuR" Version="0.2.1.0" />
+  <Identity Name="maui-package-name-placeholder" Publisher="CN=TofuR" Version="0.2.2.0" />
 
   <Properties>
     <DisplayName>SC2 Custom Campaign Manager MAUI Edition</DisplayName>

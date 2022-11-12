@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC2_CCM_Common", "SC2_CCM_C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SC2_CCM_Common_Test", "SC2_CCM_Common_Test\SC2_CCM_Common_Test.csproj", "{EB3127DA-E92D-4019-975F-EBDD76C6C2ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC2_CCM_WinForm", "SC2_CCM_WinForm\SC2_CCM_WinForm.csproj", "{FBCB3DF4-0ABC-4C38-97C9-18E3E81D230E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{EB3127DA-E92D-4019-975F-EBDD76C6C2ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB3127DA-E92D-4019-975F-EBDD76C6C2ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB3127DA-E92D-4019-975F-EBDD76C6C2ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBCB3DF4-0ABC-4C38-97C9-18E3E81D230E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBCB3DF4-0ABC-4C38-97C9-18E3E81D230E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBCB3DF4-0ABC-4C38-97C9-18E3E81D230E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBCB3DF4-0ABC-4C38-97C9-18E3E81D230E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
