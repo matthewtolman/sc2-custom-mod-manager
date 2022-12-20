@@ -8,6 +8,11 @@ This mod manager aims to work on both Mac and Windows as both platforms are offi
 
 Currently only Mac on Intel processors and Windows 10 and 11 have been tested and verified.
 
+## Mac OSX Requirements
+
+As part of .NET 7.0, the minimum Mac OSX version required is OSX 13. This is different than .NET 6.0 which works on older operating system versions.
+For this reason, there is a .NET 7.0 and a .NET 6.0 branch since OSX 13 is very recent (wanting to keep OSX 12 support for a while).
+
 ## MAUI UI
 
 Tested on Mac and Windows. Published for Mac, haven't figured out publishing for Windows. WinForm is used for the published Windows version.
