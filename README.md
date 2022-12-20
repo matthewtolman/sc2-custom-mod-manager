@@ -35,16 +35,16 @@ To get everything setup, do the following:
 ## Building
 
 ### Mac
-To build, run `dotnet run --project "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug`
+To build, run `dotnet run --project "SC2 Custom Campaign Manager" -f:net7.0-maccatalyst16.1 -c:Debug`
 
-To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug /p:CreatePackage=true`
+To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net7.0-maccatalyst16.1 -c:Debug /p:CreatePackage=true`
 
 #### Local publishing
 
-* Run `dotnet publish "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug -o out`
+* Run `dotnet publish "SC2 Custom Campaign Manager" -f:net7.0-maccatalyst16.1 -c:Debug -o out`
 
 ### Windows
-To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:Release`
+To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net7.0-windows -c:Release`
 
 ## WinForm
 
