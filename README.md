@@ -6,37 +6,45 @@ They have developed and freely released their mod manager, however their mod man
 
 This mod manager aims to work on both Mac and Windows as both platforms are officially supported by Blizzard for StarCraft II.
 
-Currently only Mac on Intel processors and Windows 10 and 11 have been tested and verified.
+Currently only Mac on Intel/ARM processors and Windows 10 and 11 have been tested and verified.
+
+## Fork Notes (ARM Mac Support)
+This fork adds support for ARM Macs while leaving as much unchanged as possible. The following changes have been made from the original
+* Updated target framework to .NET 10 for Mac builds
+* Increased minimum MacOS version to 15.0 Sequoia. This is enforced by the newer .NET Mac Catalyst SDK
+* Made minor code changes for updating to newer .NET API
+* An Intel Mac build is provided but untested
 
 ## MAUI UI
 
 Tested on Mac and Windows. Published for Mac, haven't figured out publishing for Windows. WinForm is used for the published Windows version.
 
 ### Build Requirements
+#### Windows
+The simplest setup is to install Visual Studio 2022 and add Android, iOS, C#, and MAUI to your Visual Studio.
+However, if you don't want to install Visual Studio, then you can install just the .NET CLI and go from there.
 
-For Windows, the simplest setup is to install Visual Studio 2022 and add Android, iOS, C#, and MAUI to your Visual Studio.
-Howeer, if you don't want to install Visual Studio, then you can install just the .NET CLI and go from there.
-For Mac users, you'll want to install install the .NET CLI (Visual Studio 2022 for Mac is still in pre-release).
+#### Mac
+> **Note:** Visual Studio for Mac has been discontinued. Use the .NET CLI instead.
 
-This project requires .NET 6 to be installed as well as the MAUI workload.
-To get everything setup, do the following:
+* Go to https://dotnet.microsoft.com/en-us/download and install **.NET 10**
+* Run the following commands:
+    * `sudo dotnet workload install maui`
+* Once that finishes, run:
+    * `dotnet run --project "SC2 Custom Campaign Manager" -f net10.0-maccatalyst`
 
-* Go to https://dotnet.microsoft.com/en-us/download and install .NET 6
-* Run the following command:
-    * Windows: `dotnet workload install maui` (may need to run your powershell/cmd as an Administrator)
-    * Mac: `sudo dotnet workload install maui`
-* Once that finishes, run `dotnet run --project "SC2 Custom Campaign Manager"` to launch the program
+> **Note for Mac users:** Always specify `-f net10.0-maccatalyst` explicitly in your build commands. The solution contains a Windows-only project (`SC2_CCM_WinForm`) which will cause errors if you attempt to build the whole solution without specifying a target framework.
 
 ## Building
 
 ### Mac
-To build, run `dotnet run --project "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug`
+To build, run `dotnet run --project "SC2 Custom Campaign Manager" -f:net10.0-maccatalyst -c:Debug`
 
-To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug /p:CreatePackage=true`
+To create a pkg file, run `dotnet build "SC2 Custom Campaign Manager" -f:net10.0-maccatalyst -c:Debug /p:CreatePackage=true`
 
 #### Local publishing
 
-* Run `dotnet publish "SC2 Custom Campaign Manager" -f:net6.0-maccatalyst -c:Debug -o out`
+* Run `dotnet publish "SC2 Custom Campaign Manager" -f:net10.0-maccatalyst -c:Debug -o out`
 
 ### Windows
 To build, run `dotnet build "SC2 Custom Campaign Manager" -f:net6.0-windows -c:Release`
@@ -55,7 +63,7 @@ I use Visual Studio's publishing feature for this project. Publishing is current
   * Target framework: net6.0-windows
   * Deployment mode: Self-contained
   * Target runtime: win-x64
-  * Target loxation: bin\Release\net6.0-windows\publish\win-x64\
+  * Target location: bin\Release\net6.0-windows\publish\win-x64\
   * File publish options
     * Produce single file: Checked
     * Enable ReadyToRun compilation: Checked
@@ -64,7 +72,7 @@ I use Visual Studio's publishing feature for this project. Publishing is current
   * Target framework: net6.0-windows
   * Deployment mode: Self-contained
   * Target runtime: win-x86
-  * Target loxation: bin\Release\net6.0-windows\publish\win-x86\
+  * Target location: bin\Release\net6.0-windows\publish\win-x86\
   * File publish options
     * Produce single file: Checked
     * Enable ReadyToRun compilation: Checked
@@ -89,10 +97,16 @@ That's pretty much it. All of the unzipping, detecting installed campaigns, load
 
 * Import and load different campaigns
 * Remembers last loaded campaign between sessions
-* Allows toggling cutom campaigns
+* Allows toggling custom campaigns
 * Displays campaign descriptions
 
 ### Lacking (not done yet)
 
 * Drag and drop for imports
 
+## Credits
+Original SC2CCM by 7thAce - https://github.com/7thAce/SC2CCM  
+
+SC2CCM Multi-Platform by matthewtolman - https://github.com/matthewtolman/sc2-custom-mod-manager  
+
+ARM Mac update by Swagdude7 - https://github.com/Swagdude7/sc2-custom-mod-manager-ARM-update  
