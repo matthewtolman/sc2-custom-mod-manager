@@ -211,7 +211,7 @@ public partial class MainPage : ContentPage
     /// <param name="e"></param>
     private void Info_OnClicked(object? sender, EventArgs e)
     {
-        DisplayAlert($"{Consts.AppName} v{Consts.Version}",
+        DisplayAlertAsync($"{Consts.AppName} v{Consts.Version}",
             "This is the Maui Edition of the Custom Campaign manager developed by Matt Tolman. This is not the official GiantGrantGames version of the campaign manager. The goal is to provide a tool that works on Mac as well as Windows so that Mac users can enjoy the GiantGrantGames mod ecosystem.", "Ok");
     }
     
@@ -250,7 +250,7 @@ public partial class MainPage : ContentPage
             }
         }
         SetStarCraft2Location.IsEnabled = true;
-        await DisplayAlert("SC2 Custom Mod Manager", "Unable to proceed without valid StarCraft II executable.", "Ok");
+        await DisplayAlertAsync("SC2 Custom Mod Manager", "Unable to proceed without valid StarCraft II executable.", "Ok");
     }
 
     /// <summary>
